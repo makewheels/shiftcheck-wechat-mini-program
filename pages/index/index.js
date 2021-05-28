@@ -5,6 +5,9 @@ var UseMessage = AV.Object.extend('UseMessage');
 var Avatar = AV.Object.extend('Avatar');
 var app = getApp()
 
+// 在页面中定义激励视频广告
+let videoAd = null
+
 Page({
   data: {
     lastTimestamp: 0
@@ -13,6 +16,22 @@ Page({
   onLoad: function() {
     mta.Page.init()
     wx.showShareMenu()
+
+    // 在页面onLoad回调事件中创建激励视频广告实例
+    if (wx.createRewardedVideoAd) {
+      videoAd = wx.createRewardedVideoAd({
+        adUnitId: 'adunit-79ec0f8be5efc0f1'
+      })
+      videoAd.onLoad(() => {
+        console.log('onLoad')
+      })
+      videoAd.onError((err) => {
+        console.log('onError')
+      })
+      videoAd.onClose((res) => {
+        console.log('onClose ' + res)
+      })
+    }
   },
 
   //我的获取本次使用信息
@@ -182,36 +201,60 @@ Page({
   },
 
   toWbsdWorker: function() {
+    mta.Event.stat('whichRuleButton', {
+      'whichrule': 'wbsd',
+      'workerordirector': 'worker'
+    })
     wx.navigateTo({
       url: '../wbsd/worker/worker'
     })
   },
 
   toWbsdDirector: function() {
+    mta.Event.stat('whichRuleButton', {
+      'whichrule': 'wbsd',
+      'workerordirector': 'director'
+    })
     wx.navigateTo({
       url: '../wbsd/director/director'
     })
   },
 
   toSbsdWorker: function() {
+    mta.Event.stat('whichRuleButton', {
+      'whichrule': 'sbsd',
+      'workerordirector': 'worker'
+    })
     wx.navigateTo({
       url: '../sbsd/worker/worker'
     })
   },
 
   toSbsdDirector: function() {
+    mta.Event.stat('whichRuleButton', {
+      'whichrule': 'sbsd',
+      'workerordirector': 'director'
+    })
     wx.navigateTo({
       url: '../sbsd/director/director'
     })
   },
 
   toSbbdWorker: function() {
+    mta.Event.stat('whichRuleButton', {
+      'whichrule': 'sbbd',
+      'workerordirector': 'worker'
+    })
     wx.navigateTo({
       url: '../sbbd/worker/worker'
     })
   },
 
   toSbbdDirector: function() {
+    mta.Event.stat('whichRuleButton', {
+      'whichrule': 'sbbd',
+      'workerordirector': 'director'
+    })
     wx.navigateTo({
       url: '../sbbd/director/director'
     })
