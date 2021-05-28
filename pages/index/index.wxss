@@ -39,12 +39,12 @@ text {
 
 #btn_setting {
   font-size: 50rpx;
-  width: 300rpx;
+  width: 380rpx;
   margin-top: 50rpx;
-  background-color: yellow;
+  background-color: #fff143;
 }
 
 #myDiy{
   margin-top: 10rpx;
-  width: 400rpx;
+  width: 380rpx;
 }

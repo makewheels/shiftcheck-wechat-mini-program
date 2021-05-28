@@ -1,15 +1,20 @@
 <view class="container">
   <text id="title">订阅上班推送</text>
+  <button id='btn_pushIntroduce' bindtap="pushIntroduce">什么是上班提醒推送？</button>
   <text class="row">邮件剩余：{{restMailTimes}} 封</text>
   <text class="row">短信剩余：{{restSmsTimes}} 条</text>
   <view id="mailSwitch" class="flex-wrap">
-    <text class="row">邮件开关<text class="switchColor">（{{currentMail}}）</text></text>
+    <text class="row">邮件推送<text class="redColor">（{{currentMail}}）</text></text>
     <switch bindchange="mailSwitch" checked="{{mailChecked}}" />
   </view>
-  <view class=" flex-wrap ">
-    <text class="row ">短信开关<text class="switchColor ">（{{currentSms}}）</text></text>
+  <view class=" flex-wrap">
+    <text class="row">短信推送<text class="redColor">（{{currentSms}}）</text></text>
     <switch bindchange="smsSwitch" checked="{{smsChecked}}" />
   </view>
-  <button bindtap="toNewPush" type="default">新增推送任务</button>
+  <text class="row">天气预报城市：<text class="redColor">{{city}}</text></text>
+  <picker mode="region" bindchange="bindRegionChange">
+    <button>选择城市</button>
+  </picker>
+  <button bindtap="toNewPush" type="primary">新增推送任务</button>
   <text class="row">已有推送任务：</text>
 </view>

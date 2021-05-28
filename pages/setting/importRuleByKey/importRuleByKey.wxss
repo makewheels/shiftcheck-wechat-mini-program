@@ -1,4 +1,5 @@
-#warn {
+text {
+  margin-left: 30rpx;
   color: red;
 }
 

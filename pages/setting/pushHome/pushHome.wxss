@@ -8,7 +8,6 @@
 
 #title {
   font-size: 60rpx;
-  margin-bottom: 30rpx;
 }
 
 button {
@@ -21,21 +20,24 @@ button {
 
 .row {
   font-size: 45rpx;
-  margin-top: 15rpx;
   margin-bottom: 7rpx;
 }
 
 switch {
-  margin-left: 30rpx;
+  margin-left: 15rpx;
   margin-top: 10rpx;
   margin-bottom: 10rpx;
 }
 
-.switchColor {
+.redColor {
   font-size: 45rpx;
   color: red;
 }
 
 #mailSwitch {
   margin-top: 30rpx;
+}
+
+#btn_pushIntroduce {
+  background-color: #7cc;
 }

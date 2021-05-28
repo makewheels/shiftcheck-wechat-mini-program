@@ -1,5 +1,6 @@
-Page({
+var mta = require('../../../libs/mta_analysis.js')
 
+Page({
   /**
    * 页面的初始数据
    */
@@ -20,7 +21,8 @@ Page({
     r7: "loading...",
   },
 
-  onLoad: function () {
+  onLoad: function() {
+    mta.Page.init()
     var date = new Date()
     this.setData({
       year: date.getFullYear(),
@@ -33,7 +35,7 @@ Page({
   /**
    * 返回主页
    */
-  close: function () {
+  close: function() {
     wx.navigateBack({
 
     })
@@ -42,7 +44,7 @@ Page({
   /**
    * 改data中的日期
    */
-  changeDate: function (changeDays) {
+  changeDate: function(changeDays) {
     var date = new Date(this.data.year, this.data.month, this.data.day)
     date.setDate(date.getDate() + changeDays)
     this.setData({
@@ -55,7 +57,7 @@ Page({
   /**
    * 上一天按钮
    */
-  backDay: function () {
+  backDay: function() {
     this.changeDate(-1)
     this.setText()
   },
@@ -63,7 +65,7 @@ Page({
   /**
    * 后一天按钮
    */
-  nextDay: function () {
+  nextDay: function() {
     this.changeDate(1)
     this.setText()
   },
@@ -71,7 +73,7 @@ Page({
   /**
    * 上一周按钮
    */
-  backWeek: function () {
+  backWeek: function() {
     this.changeDate(-7)
     this.setText()
   },
@@ -79,7 +81,7 @@ Page({
   /**
    * 下一周按钮
    */
-  nextWeek: function () {
+  nextWeek: function() {
     this.changeDate(7)
     this.setText()
   },
@@ -87,7 +89,7 @@ Page({
   /**
    * 返回今天按钮
    */
-  toToday: function () {
+  toToday: function() {
     //初始化时间
     var date = new Date()
     this.setData({
@@ -101,34 +103,48 @@ Page({
   /**
    * 设置7行文字
    */
-  setText: function () {
-    this.setData({ r1: this.getRow() })
+  setText: function() {
+    this.setData({
+      r1: this.getRow()
+    })
     this.changeDate(1)
-    this.setData({ r2: this.getRow() })
+    this.setData({
+      r2: this.getRow()
+    })
     this.changeDate(1)
-    this.setData({ r3: this.getRow() })
+    this.setData({
+      r3: this.getRow()
+    })
     this.changeDate(1)
-    this.setData({ r4: this.getRow() })
+    this.setData({
+      r4: this.getRow()
+    })
     this.changeDate(1)
-    this.setData({ r5: this.getRow() })
+    this.setData({
+      r5: this.getRow()
+    })
     this.changeDate(1)
-    this.setData({ r6: this.getRow() })
+    this.setData({
+      r6: this.getRow()
+    })
     this.changeDate(1)
-    this.setData({ r7: this.getRow() })
+    this.setData({
+      r7: this.getRow()
+    })
     this.changeDate(-6)
   },
 
   /**
    * 获得一行内容
    */
-  getRow: function () {
+  getRow: function() {
     return this.getDateString() + this.getBaiban() + "、" + this.getYeban()
   },
 
   /**
    * 两个日期间相差天数
    */
-  getTotalDays: function () {
+  getTotalDays: function() {
     var date1 = new Date(2017, 0, 1);
     var date2 = new Date(this.data.year, this.data.month, this.data.day)
     var days = parseInt(Math.abs(date2 - date1) / 1000 / 60 / 60 / 24)
@@ -138,7 +154,7 @@ Page({
   /**
    * 返回日期的string
    */
-  getDateString: function () {
+  getDateString: function() {
     var date = new Date(this.data.year, this.data.month, this.data.day)
     var week
     var weekNum = date.getDay()
@@ -163,7 +179,7 @@ Page({
   /**
    * 指定日期白班是哪个班组
    */
-  getBaiban: function () {
+  getBaiban: function() {
     var total = this.getTotalDays()
     var remainder = total % 21
     if (remainder == 6) {
@@ -186,7 +202,7 @@ Page({
   /**
    * 指定日期夜班是哪个班组
    */
-  getYeban: function () {
+  getYeban: function() {
     var total = this.getTotalDays()
     var remainder = total % 3
     if (remainder == 0) {

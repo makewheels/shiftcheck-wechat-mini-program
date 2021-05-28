@@ -1,4 +1,5 @@
 const AV = require('../../../libs/av-weapp-min.js');
+var mta = require('../../../libs/mta_analysis.js')
 
 Page({
   data: {
@@ -6,27 +7,31 @@ Page({
     pasteValue: ""
   },
 
-  bindKeyInput: function (e) {
+  onLoad: function() {
+    mta.Page.init()
+  },
+  
+  bindKeyInput: function(e) {
     this.setData({
       inputValue: e.detail.value
     })
   },
 
   //扫描二维码
-  scan: function () {
+  scan: function() {
     var that = this
     wx.scanCode({
-      success: function (res) {
+      success: function(res) {
         that.importRule(res.result)
       }
     })
   },
 
   //一键粘贴按钮
-  paste: function () {
+  paste: function() {
     var that = this
     wx.getClipboardData({
-      success: function (clipboard) {
+      success: function(clipboard) {
         that.setData({
           pasteValue: clipboard.data,
           inputValue: clipboard.data
@@ -36,12 +41,12 @@ Page({
   },
 
   //激活按钮
-  active: function () {
+  active: function() {
     this.importRule(this.data.inputValue)
   },
 
   //激活代码
-  importRule: function (key) {
+  importRule: function(key) {
     wx.showToast({
       title: '请稍候',
       icon: 'loading',
@@ -50,7 +55,7 @@ Page({
     //先查询此key
     var query = new AV.Query('RuleKey');
     query.equalTo('ruleKey', key);
-    query.find().then(function (ruleKeys) {
+    query.find().then(function(ruleKeys) {
       //如果没查到，说明激活码错误
       if (ruleKeys.length == 0) {
         wx.showModal({
@@ -84,7 +89,7 @@ Page({
         //查询UserRule
         var queryUserRule = new AV.Query('UserRule');
         queryUserRule.equalTo('openid', openid);
-        queryUserRule.find().then(function (userRules) {
+        queryUserRule.find().then(function(userRules) {
           //如果这用户没用过diy规则
           if (userRules.length == 0) {
             var UserRule = AV.Object.extend('UserRule');
@@ -112,7 +117,7 @@ Page({
           wx.navigateBack({});
         });
       }
-    }, function (error) {
+    }, function(error) {
       wx.showModal({
         title: '提示',
         content: '激活过程发生错误！',

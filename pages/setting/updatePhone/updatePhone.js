@@ -1,4 +1,5 @@
 const AV = require('../../../libs/av-weapp-min.js');
+var mta = require('../../../libs/mta_analysis.js')
 
 Page({
   data: {
@@ -6,20 +7,21 @@ Page({
     inputValue: ""
   },
 
-  onLoad: function (options) {
+  onLoad: function(options) {
+    mta.Page.init()
     this.setData({
       setOrUpdate: options.setOrUpdate
     })
   },
 
-  bindKeyInput: function (e) {
+  bindKeyInput: function(e) {
     this.setData({
       inputValue: e.detail.value
     })
   },
 
   //提交按钮
-  input: function () {
+  input: function() {
     var that = this
     var input = this.data.inputValue
     var openid = AV.User.current().toJSON().authData.lc_weapp.openid
@@ -38,7 +40,7 @@ Page({
     });
     var query = new AV.Query('WechatUser');
     query.equalTo('openid', openid);
-    query.find().then(function (users) {
+    query.find().then(function(users) {
       var id = users[0].id
       var user = AV.Object.createWithoutData('WechatUser', id);
       user.set('phone', input);

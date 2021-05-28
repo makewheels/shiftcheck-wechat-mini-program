@@ -1,0 +1,30 @@
+<view class="container">
+  <text id="title">新增推送任务</text>
+  <text class="subTitle">1、选择倒班规则：</text>
+  <text class="importantRow">当前规则：<text class="redColor">{{ruleName}}</text></text>
+  <button bindtap="selectRuleFromPublic">从公共规则中选择</button>
+  <button bindtap="useDiyRule">使用DIY规则</button>
+  <text class="subTitle">2、选择要订阅的班组：</text>
+  <text class="importantRow">当前班组：<text class="redColor">{{banzuName}}</text></text>
+  <button bindtap="selectBanzu">选择班组</button>
+  <text class="subTitle">3、编辑班和推送时间：</text>
+  <button id='btn_pushTimeIntroduce' bindtap="pushTimeIntroduce">什么是推送时间？</button>
+  <!--班和推送时间列表-->
+  <view wx:for="{{banAndTime}}" wx:key="{{index}}" class='ban'>
+    <view class="flex-wrap">
+      <text class='row' decode='true'>{{index+1}}&gt;{{item.ban}}：开关</text>
+      <switch data-index='{{index+1}}' bindchange="bindSwitchChange" checked='true' />
+    </view>
+    <view class="flex-wrap">
+      <text class='row'>推送时间：提前</text>
+      <input data-index='{{index+1}}' bindinput='bindInputDay' class='dayInput' type='number' value='{{item.day}}'></input>
+      <text class='row'>天，</text>
+      <text class='row'></text>
+      <input data-index='{{index+1}}' bindinput='bindInputHour' class='timeInput' type='number' value='{{item.hour}}'></input>
+      <text class='row'>点</text>
+    </view>
+  </view>
+  <text class="subTitle">4、给推送任务起个名字吧：</text>
+  <input id="nameInput" placeholder="在已有推送任务列表中显示" bindinput="bindNameInput" value="{{inputName}}"></input>
+  <button id='btn_addPush' bindtap="addPush" type='primary'>确 认 添 加</button>
+</view>

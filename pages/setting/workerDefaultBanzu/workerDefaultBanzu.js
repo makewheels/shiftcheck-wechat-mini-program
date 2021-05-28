@@ -1,3 +1,5 @@
+var mta = require('../../../libs/mta_analysis.js')
+
 Page({
   data: {
     wbsdCurrent: "loading..."
@@ -5,6 +7,7 @@ Page({
 
   //先加载已保存的设置中的内容
   onLoad: function () {
+    mta.Page.init()
     var wbsdSaved = wx.getStorageSync('setting-wbsdDefault')
     if (wbsdSaved == undefined) {
       this.setData({

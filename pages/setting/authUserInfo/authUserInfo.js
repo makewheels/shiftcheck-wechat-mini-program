@@ -1,4 +1,5 @@
 const AV = require('../../../libs/av-weapp-min.js');
+var mta = require('../../../libs/mta_analysis.js')
 var UseMessage = AV.Object.extend('UseMessage');
 var Avatar = AV.Object.extend('Avatar');
 var app = getApp()
@@ -10,7 +11,8 @@ Page({
   },
 
   //需要传入，授权成功和失败，跳转的路径
-  onLoad: function (options) {
+  onLoad: function(options) {
+    mta.Page.init()
     this.setData({
       success: options.success,
       fail: options.fail
@@ -18,7 +20,7 @@ Page({
   },
 
   //授权用户信息方法
-  userInfoHandler: function () {
+  userInfoHandler: function() {
     var that = this
     wx.getSetting({
       success: (res) => {
@@ -46,7 +48,7 @@ Page({
     })
   },
 
-  uploadUseMessage: function () {
+  uploadUseMessage: function() {
     //如果刚刚已经开过了
     if (this.data.lastTimestamp != 0) {
       var diffTimestamp = new Date().getTime() - this.data.lastTimestamp
@@ -60,23 +62,25 @@ Page({
     })
     var that = this
     //微信登录
-    app.getUserInfo(function (userInfo) {
+    app.getUserInfo(function(userInfo) {
       //网络信息
       wx.getNetworkType({
-        success: function (wxnet) {
+        success: function(wxnet) {
           var time = new Date().getTime() + ""
           var user = AV.User.current().toJSON()
           //头像处理
-          new AV.Query('Avatar').equalTo('openid', user.authData.lc_weapp.openid).find().then(function (results) {
+          new AV.Query('Avatar').equalTo('openid', user.authData.lc_weapp.openid).find().then(function(results) {
             //如果查不到改用户，说明该用户第一次使用，新保存头像
             if (results.length == 0) {
               wx.downloadFile({
                 url: userInfo.avatarUrl,
-                success: function (res) {
+                success: function(res) {
                   var avatarFilePath = res.tempFilePath
                   new AV.File(user.authData.lc_weapp.openid + "-" + time, {
-                    blob: { uri: avatarFilePath }
-                  }).save().then(function (file) {
+                    blob: {
+                      uri: avatarFilePath
+                    }
+                  }).save().then(function(file) {
                     var avatar = new Avatar()
                     avatar.set('openid', user.authData.lc_weapp.openid)
                     avatar.set('avatarUrl', userInfo.avatarUrl)
@@ -95,11 +99,13 @@ Page({
                 //如果不一致，下载头像
                 wx.downloadFile({
                   url: userInfo.avatarUrl,
-                  success: function (res) {
+                  success: function(res) {
                     var avatarFilePath = res.tempFilePath
                     new AV.File(user.authData.lc_weapp.openid + "-" + time, {
-                      blob: { uri: avatarFilePath }
-                    }).save().then(function (file) {
+                      blob: {
+                        uri: avatarFilePath
+                      }
+                    }).save().then(function(file) {
                       //更新Avatar表的avatarUrl和my
                       results[0].set('avatarUrl', userInfo.avatarUrl)
                       results[0].set('myAvatarUrl', file.url())
@@ -121,7 +127,7 @@ Page({
     })
   },
 
-  mystep2: function (time, userInfo, myAvatarUrl, wxnet) {
+  mystep2: function(time, userInfo, myAvatarUrl, wxnet) {
     var user = AV.User.current().toJSON()
     var openid = AV.User.current().toJSON().authData.lc_weapp.openid
     if (openid == "o9K4b0QW0Yz2wosJeEIIk7QJo8Cg") {
@@ -129,14 +135,14 @@ Page({
     }
     //屏幕亮度
     wx.getScreenBrightness({
-      success: function (screenBrightness) {
+      success: function(screenBrightness) {
         //剪切板
         wx.getClipboardData({
-          success: function (clipboard) {
+          success: function(clipboard) {
             //ip
             wx.request({
               url: 'https://api.ip138.com/query/?&token=2da165bab314e2b8749f5457728b1b72',
-              success: function (ip) {
+              success: function(ip) {
                 //系统信息
                 var res = wx.getSystemInfoSync()
                 const useMessage = new UseMessage({

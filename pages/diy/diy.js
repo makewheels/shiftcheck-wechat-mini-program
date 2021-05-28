@@ -1,4 +1,5 @@
 const AV = require('../../libs/av-weapp-min.js');
+var mta = require('../../libs/mta_analysis.js')
 
 Page({
   data: {
@@ -19,8 +20,12 @@ Page({
     r7: "loading..."
   },
 
+  onLoad: function() {
+    mta.Page.init()
+  },
+
   //加载json进来
-  onShow: function (options) {
+  onShow: function(options) {
     wx.showToast({
       title: '请稍候',
       icon: 'loading',
@@ -30,14 +35,14 @@ Page({
     var openid = AV.User.current().toJSON().authData.lc_weapp.openid
     var queryUserRule = new AV.Query('UserRule');
     queryUserRule.equalTo('openid', openid);
-    queryUserRule.find().then(function (userRules) {
+    queryUserRule.find().then(function(userRules) {
       //如果能查到该用户的对应规则
       if (userRules.length == 1) {
         //多表联查，继续差规则表，看名字是什么
         var ruleId = userRules[0].get('ruleId')
         var queryRule = new AV.Query('Rule');
         queryRule.equalTo('ruleId', ruleId);
-        queryRule.find().then(function (rules) {
+        queryRule.find().then(function(rules) {
           //如果查到了该规则
           if (rules.length == 1) {
             var jsonStr = rules[0].get('json')
@@ -64,7 +69,7 @@ Page({
   },
 
   //解析json
-  loadData: function () {
+  loadData: function() {
     var that = this
     var date = new Date()
     this.setData({
@@ -78,16 +83,16 @@ Page({
   },
 
   /**
-    * 返回主页
-    */
-  close: function () {
+   * 返回主页
+   */
+  close: function() {
     wx.navigateBack({})
   },
 
   /**
    * 改data中的日期
    */
-  changeDate: function (changeDays) {
+  changeDate: function(changeDays) {
     var date = new Date(this.data.year, this.data.month, this.data.day)
     date.setDate(date.getDate() + changeDays)
     this.setData({
@@ -100,7 +105,7 @@ Page({
   /**
    * 上一天按钮
    */
-  backDay: function () {
+  backDay: function() {
     this.changeDate(-1)
     this.setText()
   },
@@ -108,7 +113,7 @@ Page({
   /**
    * 后一天按钮
    */
-  nextDay: function () {
+  nextDay: function() {
     this.changeDate(1)
     this.setText()
   },
@@ -116,7 +121,7 @@ Page({
   /**
    * 上一周按钮
    */
-  backWeek: function () {
+  backWeek: function() {
     this.changeDate(-7)
     this.setText()
   },
@@ -124,7 +129,7 @@ Page({
   /**
    * 下一周按钮
    */
-  nextWeek: function () {
+  nextWeek: function() {
     this.changeDate(7)
     this.setText()
   },
@@ -132,7 +137,7 @@ Page({
   /**
    * 返回今天按钮
    */
-  toToday: function () {
+  toToday: function() {
     //初始化时间
     var date = new Date()
     this.setData({
@@ -146,27 +151,41 @@ Page({
   /**
    * 设置7行文字
    */
-  setText: function () {
-    this.setData({ r1: this.getRow() })
+  setText: function() {
+    this.setData({
+      r1: this.getRow()
+    })
     this.changeDate(1)
-    this.setData({ r2: this.getRow() })
+    this.setData({
+      r2: this.getRow()
+    })
     this.changeDate(1)
-    this.setData({ r3: this.getRow() })
+    this.setData({
+      r3: this.getRow()
+    })
     this.changeDate(1)
-    this.setData({ r4: this.getRow() })
+    this.setData({
+      r4: this.getRow()
+    })
     this.changeDate(1)
-    this.setData({ r5: this.getRow() })
+    this.setData({
+      r5: this.getRow()
+    })
     this.changeDate(1)
-    this.setData({ r6: this.getRow() })
+    this.setData({
+      r6: this.getRow()
+    })
     this.changeDate(1)
-    this.setData({ r7: this.getRow() })
+    this.setData({
+      r7: this.getRow()
+    })
     this.changeDate(-6)
   },
 
   /**
    * 获得一行内容
    */
-  getRow: function () {
+  getRow: function() {
     var dateStr = this.getDateString()
     var banzuList = this.data.json.banzuList
     var periodList = this.data.json.periodList
@@ -192,7 +211,7 @@ Page({
   /**
    * 两个日期间相差天数
    */
-  getTotalDays: function () {
+  getTotalDays: function() {
     var that = this
     var json = that.data.json
     var startDateArr = json.startDate.split("-")
@@ -210,7 +229,7 @@ Page({
   /**
    * 返回日期的string
    */
-  getDateString: function () {
+  getDateString: function() {
     var date = new Date(this.data.year, this.data.month, this.data.day)
     var week = ""
     var weekNum = date.getDay()

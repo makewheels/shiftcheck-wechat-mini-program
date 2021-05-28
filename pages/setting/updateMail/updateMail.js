@@ -1,4 +1,5 @@
 const AV = require('../../../libs/av-weapp-min.js');
+var mta = require('../../../libs/mta_analysis.js')
 
 Page({
   data: {
@@ -7,6 +8,7 @@ Page({
   },
 
   onLoad: function (options) {
+    mta.Page.init()
     this.setData({
       setOrUpdate: options.setOrUpdate
     })

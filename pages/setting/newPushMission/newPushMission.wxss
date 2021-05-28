@@ -1,0 +1,93 @@
+.container {
+  padding-top: 5rpx;
+}
+
+.flex-wrap {
+  display: -webkit-flex;
+}
+
+#title {
+  font-size: 60rpx;
+}
+
+button {
+  margin-top: 30rpx;
+  margin-bottom: 10rpx;
+  width: 600rpx;
+  height: 100rpx;
+  line-height: 100rpx;
+}
+
+.subTitle {
+  align-self: left;
+  margin-left: 30rpx;
+  font-size: 45rpx;
+  margin-top: 25rpx;
+  margin-bottom: 12rpx;
+}
+
+.row {
+  font-size: 45rpx;
+  margin-bottom: 7rpx;
+}
+
+.importantRow {
+  font-size: 45rpx;
+}
+
+switch {
+  margin-left: 30rpx;
+  margin-top: 10rpx;
+  margin-bottom: 10rpx;
+}
+
+.redColor {
+  font-size: 45rpx;
+  color: red;
+}
+
+#nameInput {
+  height: 100rpx;
+  padding-left: 30rpx;
+  width: 700rpx;
+  font-size: 50rpx;
+  background-color: yellow;
+}
+
+.dayInput {
+  margin-left: 10rpx;
+  margin-right: 10rpx;
+  background-color: lightskyblue;
+  font-size: 50rpx;
+  height: 90rpx;
+  width: 90rpx;
+  text-align: center;
+}
+
+.timeInput {
+  margin-left: 10rpx;
+  margin-right: 10rpx;
+  background-color: lightpink;
+  font-size: 50rpx;
+  height: 90rpx;
+  width: 90rpx;
+  text-align: center;
+}
+
+.ban {
+  margin-top: 25rpx;
+  margin-bottom: 25rpx;
+  background-color: #e3f9fd;
+  padding-left: 20rpx;
+  padding-right: 20rpx;
+  padding-bottom: 15rpx;
+}
+
+#btn_addPush {
+  margin-top: 50rpx;
+  margin-bottom: 50rpx;
+}
+
+#btn_pushTimeIntroduce {
+  background-color: #7cc;
+}

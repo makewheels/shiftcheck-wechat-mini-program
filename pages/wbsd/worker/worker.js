@@ -1,3 +1,5 @@
+var mta = require('../../../libs/mta_analysis.js')
+
 Page({
   data: {
     //模式名
@@ -21,7 +23,8 @@ Page({
   },
 
   //页面初始化
-  onLoad: function () {
+  onLoad: function() {
+    mta.Page.init()
     //初始化班组
     //先调保存的设置
     var wbsdDefault = wx.getStorageSync('setting-wbsdDefault')
@@ -51,7 +54,7 @@ Page({
   /**
    * 改data中的日期
    */
-  changeDate: function (changeDays) {
+  changeDate: function(changeDays) {
     var date = new Date(this.data.year, this.data.month, this.data.day)
     date.setDate(date.getDate() + changeDays)
     this.setData({
@@ -64,20 +67,34 @@ Page({
   /**
    * 设置7行文字
    */
-  setText: function () {
-    this.setData({ r1: this.getDateString() + this.getWork() })
+  setText: function() {
+    this.setData({
+      r1: this.getDateString() + this.getWork()
+    })
     this.changeDate(1)
-    this.setData({ r2: this.getDateString() + this.getWork() })
+    this.setData({
+      r2: this.getDateString() + this.getWork()
+    })
     this.changeDate(1)
-    this.setData({ r3: this.getDateString() + this.getWork() })
+    this.setData({
+      r3: this.getDateString() + this.getWork()
+    })
     this.changeDate(1)
-    this.setData({ r4: this.getDateString() + this.getWork() })
+    this.setData({
+      r4: this.getDateString() + this.getWork()
+    })
     this.changeDate(1)
-    this.setData({ r5: this.getDateString() + this.getWork() })
+    this.setData({
+      r5: this.getDateString() + this.getWork()
+    })
     this.changeDate(1)
-    this.setData({ r6: this.getDateString() + this.getWork() })
+    this.setData({
+      r6: this.getDateString() + this.getWork()
+    })
     this.changeDate(1)
-    this.setData({ r7: this.getDateString() + this.getWork() })
+    this.setData({
+      r7: this.getDateString() + this.getWork()
+    })
     this.changeDate(-6)
   },
 
@@ -136,7 +153,7 @@ Page({
   /**
    * 上一天按钮
    */
-  backDay: function () {
+  backDay: function() {
     this.changeDate(-1)
     this.setText()
   },
@@ -144,7 +161,7 @@ Page({
   /**
    * 后一天按钮
    */
-  nextDay: function () {
+  nextDay: function() {
     this.changeDate(1)
     this.setText()
   },
@@ -152,7 +169,7 @@ Page({
   /**
    * 上一周按钮
    */
-  backWeek: function () {
+  backWeek: function() {
     this.changeDate(-7)
     this.setText()
   },
@@ -160,7 +177,7 @@ Page({
   /**
    * 下一周按钮
    */
-  nextWeek: function () {
+  nextWeek: function() {
     this.changeDate(7)
     this.setText()
   },
@@ -168,7 +185,7 @@ Page({
   /**
    * 返回今天按钮
    */
-  toToday: function () {
+  toToday: function() {
     //初始化时间
     var date = new Date()
     this.setData({
@@ -182,7 +199,7 @@ Page({
   /**
    * 两个日期间相差天数
    */
-  getTotalDays: function () {
+  getTotalDays: function() {
     var date1 = new Date(2016, 6, 7);
     var date2 = new Date(this.data.year, this.data.month, this.data.day)
     var days = parseInt(Math.abs(date2 - date1) / 1000 / 60 / 60 / 24)
@@ -192,7 +209,7 @@ Page({
   /**
    * 返回日期的string
    */
-  getDateString: function () {
+  getDateString: function() {
     var date = new Date(this.data.year, this.data.month, this.data.day)
     var week
     var weekNum = date.getDay()
@@ -217,35 +234,35 @@ Page({
   /**
    * 设置班组按钮
    */
-  setBanzu1: function () {
+  setBanzu1: function() {
     this.setData({
       banzuId: 1,
       banzuName: "一班"
     })
     this.setText()
   },
-  setBanzu2: function () {
+  setBanzu2: function() {
     this.setData({
       banzuId: 2,
       banzuName: "二班"
     })
     this.setText()
   },
-  setBanzu3: function () {
+  setBanzu3: function() {
     this.setData({
       banzuId: 3,
       banzuName: "三班"
     })
     this.setText()
   },
-  setBanzu4: function () {
+  setBanzu4: function() {
     this.setData({
       banzuId: 4,
       banzuName: "四班"
     })
     this.setText()
   },
-  setBanzu5: function () {
+  setBanzu5: function() {
     this.setData({
       banzuId: 5,
       banzuName: "五班"
@@ -256,14 +273,14 @@ Page({
   /**
    * 返回主页
    */
-  close: function () {
+  close: function() {
     wx.navigateBack({})
   },
 
   /**
    * 日期选择
    */
-  bindDateChange: function (e) {
+  bindDateChange: function(e) {
     var dateArr = e.detail.value.split("-")
     var year = parseInt(dateArr[0])
     var month = parseInt(dateArr[1])

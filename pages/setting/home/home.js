@@ -1,7 +1,11 @@
 const AV = require('../../../libs/av-weapp-min.js');
+var mta = require('../../../libs/mta_analysis.js')
 
 Page({
-  data: {
+  data: {},
+
+  onLoad: function() {
+    mta.Page.init()
   },
 
   /**
@@ -11,7 +15,7 @@ Page({
    * success:授权成功从授权页面跳转的路径
    * fail:授权失败从授权页面跳转的路径
    */
-  checkAuthUserInfo: function (url, success, fail) {
+  checkAuthUserInfo: function(url, success, fail) {
     wx.getSetting({
       success: (res) => {
         var isAuth = res.authSetting['scope.userInfo']
@@ -29,14 +33,14 @@ Page({
   },
 
   //设置默认班组
-  toWorkerDefaultBanzu: function () {
+  toWorkerDefaultBanzu: function() {
     wx.navigateTo({
       url: '../workerDefaultBanzu/workerDefaultBanzu',
     })
   },
 
   //我的DIY规则
-  toMyRule: function () {
+  toMyRule: function() {
     var url = '../myRuleHome/myRuleHome'
     var success = '../myRuleHome/myRuleHome'
     var fail = '../home/home'
@@ -44,7 +48,7 @@ Page({
   },
 
   //订阅上班推送
-  toPushHome: function () {
+  toPushHome: function() {
     wx.showToast({
       title: '请稍候',
       icon: 'loading',
@@ -53,7 +57,7 @@ Page({
     var that = this
     var query = new AV.Query('WechatUser');
     query.equalTo('openid', AV.User.current().toJSON().authData.lc_weapp.openid);
-    query.find().then(function (users) {
+    query.find().then(function(users) {
       if (users.length == 0 || users[0].get('mail') == undefined || users[0].get('mail') == "") {
         wx.hideToast()
         wx.navigateTo({
@@ -74,14 +78,14 @@ Page({
   },
 
   //用户反馈
-  toFeedback: function () {
+  toFeedback: function() {
     wx.navigateTo({
       url: '../feedback/feedback',
     })
   },
 
   //我的账户
-  toAccountHome: function () {
+  toAccountHome: function() {
     wx.navigateTo({
       url: '../accountHome/accountHome',
     })

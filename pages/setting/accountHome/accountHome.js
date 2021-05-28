@@ -1,4 +1,5 @@
 const AV = require('../../../libs/av-weapp-min.js');
+var mta = require('../../../libs/mta_analysis.js')
 
 Page({
   data: {
@@ -6,6 +7,10 @@ Page({
     phone: "loading...",
     setOrUpdateMail: "设置",
     setOrUpdatePhone: "设置"
+  },
+
+  onLoad: function () {
+    mta.Page.init()
   },
 
   onShow: function (options) {

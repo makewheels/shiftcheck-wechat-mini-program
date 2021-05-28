@@ -19,6 +19,11 @@ button {
   line-height: 100rpx;
 }
 
+.importantRow {
+  margin-top: 50rpx;
+  font-size: 50rpx;
+}
+
 #mail {
   margin-top: 50rpx;
   color: red;
