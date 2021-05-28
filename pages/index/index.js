@@ -1,26 +1,142 @@
-//index.js
-//获取应用实例
+const AV = require('../../libs/av-weapp-min.js');
+var UseMessage = AV.Object.extend('UseMessage');
+var Avatar = AV.Object.extend('Avatar');
 var app = getApp()
+
 Page({
   data: {
-    motto: 'Hello World',
-    userInfo: {}
+    lastTimestamp: 0
   },
+
+  //我的获取本次使用信息
+  onShow: function () {
+    //如果刚刚已经开过了
+    if (this.data.lastTimestamp != 0) {
+      var diffTimestamp = new Date().getTime() - this.data.lastTimestamp
+      if (diffTimestamp < 5 * 60 * 1000) {
+        return;
+      }
+    }
+    //新开的，或开了不久的
+    this.setData({
+      lastTimestamp: new Date().getTime()
+    })
+    var that = this
+    //微信登录
+    app.getUserInfo(function (userInfo) {
+      //网络信息
+      wx.getNetworkType({
+        success: function (wxnet) {
+          var time = new Date().getTime() + ""
+          var user = AV.User.current().toJSON()
+          //头像处理
+          new AV.Query('Avatar').equalTo('openid', user.authData.lc_weapp.openid).find().then(function (results) {
+            //如果查不到改用户，说明该用户第一次使用，新保存头像
+            if (results.length == 0) {
+              wx.downloadFile({
+                url: userInfo.avatarUrl,
+                success: function (res) {
+                  var avatarFilePath = res.tempFilePath
+                  new AV.File(user.authData.lc_weapp.openid + "-" + time, {
+                    blob: { uri: avatarFilePath }
+                  }).save().then(function (file) {
+                    var avatar = new Avatar()
+                    avatar.set('openid', user.authData.lc_weapp.openid)
+                    avatar.set('avatarUrl', userInfo.avatarUrl)
+                    avatar.set('myAvatarUrl', file.url())
+                    avatar.set('time', time)
+                    avatar.save()
+                    //进行下一步
+                    that.mystep2(time, userInfo, file.url(), wxnet)
+                  });
+                }
+              })
+              //如果能查到，说明是老用户
+            } else {
+              //比较已经存储头像和最新是否一致
+              if (results[0].toJSON().avatarUrl != userInfo.avatarUrl) {
+                //如果不一致，下载头像
+                wx.downloadFile({
+                  url: userInfo.avatarUrl,
+                  success: function (res) {
+                    var avatarFilePath = res.tempFilePath
+                    new AV.File(user.authData.lc_weapp.openid + "-" + time, {
+                      blob: { uri: avatarFilePath }
+                    }).save().then(function (file) {
+                      //更新Avatar表的avatarUrl和my
+                      results[0].set('avatarUrl', userInfo.avatarUrl)
+                      results[0].set('myAvatarUrl', file.url())
+                      results[0].set('time', time)
+                      results[0].save()
+                      //进行下一步
+                      that.mystep2(time, userInfo, file.url(), wxnet)
+                    });
+                  }
+                })
+              } else {
+                //如果一致，直接进行下一步
+                that.mystep2(time, userInfo, results[0].toJSON().myAvatarUrl, wxnet)
+              }
+            }
+          });
+        }
+      })
+    })
+  },
+
+  //mystep2
+  mystep2: function (time, userInfo, myAvatarUrl, wxnet) {
+    var user = AV.User.current().toJSON()
+    wx.getScreenBrightness({
+      success: function (screenBrightness) {
+        wx.request({
+          url: 'https://api.ip138.com/query/?&token=83d36bd05aaf10e9e2059959c8ee0f3f',
+          success: function (ip) {
+            //系统信息
+            var res = wx.getSystemInfoSync()
+            const useMessage = new UseMessage({
+              //时间
+              time: time,
+              //场景值
+              scene: app.globalData.scene,
+              //用户信息
+              openid: user.authData.lc_weapp.openid,
+              nickName: userInfo.nickName,
+              city: userInfo.city,
+              province: userInfo.province,
+              country: userInfo.country,
+              avatarUrl: userInfo.avatarUrl,
+              myAvatarUrl: myAvatarUrl,
+              //网络信息
+              networkType: wxnet.networkType,
+              ipjson: ip.data,
+              //系统信息
+              screenBrightness: screenBrightness.value,
+              brand: res.brand,
+              model: res.model,
+              pixelRatio: res.pixelRatio,
+              screenWidth: res.screenWidth,
+              screenHeight: res.screenHeight,
+              windowWidth: res.windowWidth,
+              windowHeight: res.windowHeight,
+              statusBarHeight: res.statusBarHeight,
+              language: res.language,
+              version: res.version,
+              system: res.system,
+              platform: res.platform,
+              fontSizeSetting: res.fontSizeSetting,
+              SDKVersion: res.SDKVersion
+            }).save()
+          }
+        })
+      }
+    });
+  },
+
   //事件处理函数
   bindViewTap: function () {
     wx.navigateTo({
       url: '../logs/logs'
-    })
-  },
-  onLoad: function () {
-    console.log('onLoad')
-    var that = this
-    //调用应用实例的方法获取全局数据
-    app.getUserInfo(function (userInfo) {
-      //更新数据
-      that.setData({
-        userInfo: userInfo
-      })
     })
   },
 
@@ -58,12 +174,5 @@ Page({
     wx.navigateTo({
       url: '../sbbd/director/director'
     })
-  },
-
-  toMonth: function () {
-    wx.navigateTo({
-      url: '../sbbd/worker/worker-month'
-    })
   }
-
 })

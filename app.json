@@ -7,8 +7,7 @@
     "pages/sbsd/director/director",
     "pages/sbsd/worker/worker",
     "pages/sbbd/director/director",
-    "pages/sbbd/worker/worker",
-    "pages/sbbd/worker/worker-month"
+    "pages/sbbd/worker/worker"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -18,9 +18,8 @@
     <button bindtap="toSbbdWorker" type="primary">个 人</button>
     <button bindtap="toSbbdDirector" type="primary">总 览</button>
   </view>
-  <button bindtap="toMonth" type="warn">看月份</button>
   <view id="description">
     <view>由衷地感谢您的支持！</view>
   </view>
-  <view>version:2.0.0</view>
+  <view>version:2.0.1</view>
 </view>
