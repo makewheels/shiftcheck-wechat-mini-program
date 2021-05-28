@@ -1,0 +1,26 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="title">乔彬原创：查班神器</view>
+  <span>热电厂：</span>
+  <view class="flex-wrap">
+    <text>五班三倒：</text>
+    <button bindtap="toWbsdWorker" hover-class="hover">个 人</button>
+    <button bindtap="toWbsdDirector" hover-class="hover">总 览</button>
+  </view>
+  <span>采油队：</span>
+  <view class="flex-wrap">
+    <text>四班四倒：</text>
+    <button bindtap="toSbsdWorker" type="primary">个 人</button>
+    <button bindtap="toSbsdDirector" type="primary">总 览</button>
+  </view>
+  <view class="flex-wrap">
+    <text>三班半倒：</text>
+    <button bindtap="toSbbdWorker" type="primary">个 人</button>
+    <button bindtap="toSbbdDirector" type="primary">总 览</button>
+  </view>
+  <button bindtap="toMonth" type="warn">看月份</button>
+  <view id="description">
+    <view>由衷地感谢您的支持！</view>
+  </view>
+  <view>version:2.0.0</view>
+</view>

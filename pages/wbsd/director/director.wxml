@@ -1,0 +1,22 @@
+<view class="container">
+  <view class="subtitle">五班三倒：{{modeName}}模式</view>
+  <text>{{r1}}</text>
+  <text>{{r2}}</text>
+  <text>{{r3}}</text>
+  <text>{{r4}}</text>
+  <text>{{r5}}</text>
+  <text>{{r6}}</text>
+  <text>{{r7}}</text>
+  <view class="flex-wrap">
+    <button bindtap="backDay">前 一 天</button>
+    <button bindtap="nextDay">后 一 天</button>
+  </view>
+  <view class="flex-wrap">
+    <button class="yellow" bindtap="backWeek">上 一 周</button>
+    <button class="yellow" bindtap="nextWeek">下 一 周</button>
+  </view>
+  <view class="flex-wrap">
+    <button bindtap="toToday" type="primary">返回今天</button>
+    <button bindtap="close" type="warn">返回主页</button>
+  </view>
+</view>

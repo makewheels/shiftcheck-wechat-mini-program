@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/logs/logs",
+    "pages/wbsd/worker/worker",
+    "pages/wbsd/director/director",
+    "pages/sbsd/director/director",
+    "pages/sbsd/worker/worker",
+    "pages/sbbd/director/director",
+    "pages/sbbd/worker/worker",
+    "pages/sbbd/worker/worker-month"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#98f5ff",
+    "navigationBarTitleText": "查班神器：微信小程序",
+    "navigationBarTextStyle": "black"
+  }
+}

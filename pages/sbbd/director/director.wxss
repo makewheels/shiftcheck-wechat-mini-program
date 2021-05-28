@@ -1,0 +1,17 @@
+.container {
+  padding: 100rpx 0;
+}
+
+.subtitle {
+  color: blue;
+  font-size: 50rpx;
+  margin-bottom: 30rpx;
+}
+
+.yellow {
+  background-color: yellow;
+}
+
+.flex-wrap {
+  display: -webkit-flex;
+}
