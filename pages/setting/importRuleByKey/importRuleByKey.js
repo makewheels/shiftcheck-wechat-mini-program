@@ -9,6 +9,7 @@ Page({
 
   onLoad: function() {
     mta.Page.init()
+    wx.showShareMenu()
   },
   
   bindKeyInput: function(e) {

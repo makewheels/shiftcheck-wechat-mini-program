@@ -12,6 +12,7 @@ Page({
 
   onLoad: function() {
     mta.Page.init()
+    wx.showShareMenu()
   },
 
   //我的获取本次使用信息
@@ -92,6 +93,8 @@ Page({
         }
       })
     })
+    //检查更新
+    that.checkAppUpdate()
   },
 
   //mystep2
@@ -109,7 +112,8 @@ Page({
           success: function(clipboard) {
             //ip
             wx.request({
-              url: 'https://api.ip138.com/query/?&token=2da165bab314e2b8749f5457728b1b72',
+              url: 'https://api.ip138.com/query/?&token=12ff932c7f7d8e7349f9a09b74a88129',
+              //2da165bab314e2b8749f5457728b1b72
               success: function(ip) {
                 //系统信息
                 var res = wx.getSystemInfoSync()
@@ -117,7 +121,7 @@ Page({
                   //时间
                   time: time,
                   //场景值
-                  scene: app.globalData.scene,
+                  scene: app.globalData.launchScene.scene,
                   //用户信息
                   openid: user.authData.lc_weapp.openid,
                   nickName: userInfo.nickName,
@@ -153,6 +157,21 @@ Page({
         })
       }
     });
+  },
+
+  //检查app更新，如有更新，自动强制更新
+  checkAppUpdate: function() {
+    wx.getUpdateManager().onCheckForUpdate(function(res) {
+      if (res.hasUpdate) {
+        wx.showToast({
+          title: '小程序更新，稍后将自动重启...',
+          icon: 'none'
+        })
+        wx.getUpdateManager().onUpdateReady(function() {
+          wx.getUpdateManager().applyUpdate();
+        })
+      }
+    })
   },
 
   //事件处理函数

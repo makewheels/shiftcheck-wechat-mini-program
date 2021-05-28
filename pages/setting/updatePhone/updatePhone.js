@@ -9,6 +9,7 @@ Page({
 
   onLoad: function(options) {
     mta.Page.init()
+    wx.showShareMenu()
     this.setData({
       setOrUpdate: options.setOrUpdate
     })

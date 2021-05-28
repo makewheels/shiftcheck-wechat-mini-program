@@ -1,11 +1,21 @@
 const AV = require('../../../libs/av-weapp-min.js');
 var mta = require('../../../libs/mta_analysis.js')
+var app = getApp()
 
 Page({
   data: {},
 
   onLoad: function() {
     mta.Page.init()
+    wx.showShareMenu()
+    this.setData({
+      appVersion: app.globalData.appVersion
+    })
+  },
+
+  //打开页面先干掉加载框（可能是从授权页，因为拒绝，回来的）
+  onShow: function() {
+    wx.hideToast()
   },
 
   /**

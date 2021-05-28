@@ -22,6 +22,7 @@ Page({
 
   onLoad: function() {
     mta.Page.init()
+    wx.showShareMenu()
   },
 
   //加载json进来

@@ -11,6 +11,7 @@ Page({
 
   onLoad: function () {
     mta.Page.init()
+    wx.showShareMenu()
   },
 
   onShow: function (options) {
@@ -69,11 +70,11 @@ Page({
         user.set('mailPushTimes', 5)
         user.set('smsPushTimes', 5)
         user.save().then(function (user) {
-          wx.showModal({
-            title: '提示',
-            content: '新用户享5次免费邮件短信推送',
-            showCancel:false
-          })
+          // wx.showModal({
+          //   title: '提示',
+          //   content: '新用户享5次免费邮件短信推送',
+          //   showCancel:false
+          // })
           that.setData({
             mail: "未设置",
             phone: "未设置",

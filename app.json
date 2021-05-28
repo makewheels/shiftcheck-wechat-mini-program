@@ -26,5 +26,6 @@
     "navigationBarBackgroundColor": "#98f5ff",
     "navigationBarTitleText": "查班神器",
     "navigationBarTextStyle": "black"
-  }
+  },
+  "sitemapLocation": "sitemap.json"
 }

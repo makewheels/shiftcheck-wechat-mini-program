@@ -28,3 +28,6 @@
   <input id="nameInput" placeholder="在已有推送任务列表中显示" bindinput="bindNameInput" value="{{inputName}}"></input>
   <button id='btn_addPush' bindtap="addPush" type='primary'>确 认 添 加</button>
 </view>
+<view class="ad-banner">
+  <ad unit-id="adunit-499feca899514736"></ad>
+</view>

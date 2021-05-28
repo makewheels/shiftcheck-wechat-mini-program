@@ -23,3 +23,7 @@ button {
   color: red;
   font-size: 50rpx;
 }
+
+.ad-banner {
+  margin-top: 500rpx;
+}

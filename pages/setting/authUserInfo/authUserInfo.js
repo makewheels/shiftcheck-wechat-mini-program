@@ -13,10 +13,16 @@ Page({
   //需要传入，授权成功和失败，跳转的路径
   onLoad: function(options) {
     mta.Page.init()
+    wx.showShareMenu()
     this.setData({
       success: options.success,
       fail: options.fail
     })
+  },
+
+  //取消按钮：关闭页面
+  close: function() {
+    wx.navigateBack({})
   },
 
   //授权用户信息方法
@@ -149,7 +155,7 @@ Page({
                   //时间
                   time: time,
                   //场景值
-                  scene: app.globalData.scene,
+                  scene: app.globalData.launchScene.scene,
                   //用户信息
                   openid: user.authData.lc_weapp.openid,
                   nickName: userInfo.nickName,

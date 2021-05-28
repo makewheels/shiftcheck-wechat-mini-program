@@ -15,6 +15,7 @@ Page({
 
   onLoad: function () {
     mta.Page.init()
+    wx.showShareMenu()
   },
 
   selectRuleFromPublic: function () {

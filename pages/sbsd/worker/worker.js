@@ -28,6 +28,7 @@ Page({
 
   onLoad: function() {
     mta.Page.init()
+    wx.showShareMenu()
     //初始化班组
     this.setBanzu1()
     //初始化时间

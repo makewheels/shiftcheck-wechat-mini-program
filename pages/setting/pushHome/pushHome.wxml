@@ -18,3 +18,6 @@
   <button bindtap="toNewPush" type="primary">新增推送任务</button>
   <text class="row">已有推送任务：</text>
 </view>
+<view class="ad-banner">
+  <ad unit-id="adunit-499feca899514736"></ad>
+</view>

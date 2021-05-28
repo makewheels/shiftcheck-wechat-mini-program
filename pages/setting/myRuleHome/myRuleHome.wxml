@@ -6,3 +6,6 @@
 <button bindtap="toImportRuleByKey">激活码导入</button>
 <button bindtap="deleteRule">删除已有规则</button>
 <!-- <button bindtap="setHomepage">主页默认打开页面</button> -->
+<view class="ad-banner">
+  <ad unit-id="adunit-499feca899514736"></ad>
+</view>

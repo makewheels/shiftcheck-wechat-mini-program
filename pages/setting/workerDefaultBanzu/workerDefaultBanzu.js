@@ -8,6 +8,7 @@ Page({
   //先加载已保存的设置中的内容
   onLoad: function () {
     mta.Page.init()
+    wx.showShareMenu()
     var wbsdSaved = wx.getStorageSync('setting-wbsdDefault')
     if (wbsdSaved == undefined) {
       this.setData({

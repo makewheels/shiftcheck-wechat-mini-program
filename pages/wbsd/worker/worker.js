@@ -25,6 +25,7 @@ Page({
   //页面初始化
   onLoad: function() {
     mta.Page.init()
+    wx.showShareMenu()
     //初始化班组
     //先调保存的设置
     var wbsdDefault = wx.getStorageSync('setting-wbsdDefault')

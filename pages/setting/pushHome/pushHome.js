@@ -14,6 +14,7 @@ Page({
 
   onLoad: function() {
     mta.Page.init()
+    wx.showShareMenu()
   },
 
   onShow: function() {

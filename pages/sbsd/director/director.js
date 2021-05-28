@@ -24,6 +24,7 @@ Page({
 
   onLoad: function() {
     mta.Page.init()
+    wx.showShareMenu()
     var date = new Date()
     this.setData({
       year: date.getFullYear(),

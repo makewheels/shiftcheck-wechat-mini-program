@@ -7,3 +7,6 @@
   <button bindtap="paste">一键粘贴</button>
   <button type='primary' bindtap="active">激 活</button>
 </view>
+<view class="ad-banner">
+  <ad unit-id="adunit-499feca899514736"></ad>
+</view>

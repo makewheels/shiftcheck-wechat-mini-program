@@ -1,2 +1,5 @@
 <input type="number" placeholder="输入您的手机" bindinput="bindKeyInput"></input>
 <button type='primary' bindtap="input">{{setOrUpdate}}手机</button>
+<view class="ad-banner">
+  <ad unit-id="adunit-499feca899514736"></ad>
+</view>

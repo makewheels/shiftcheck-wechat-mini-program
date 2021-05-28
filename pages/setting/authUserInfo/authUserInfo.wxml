@@ -1,2 +1,6 @@
-<view>您需要授权用户信息才可使用</view>
-<button type="primary" open-type="getUserInfo" bindgetuserinfo="userInfoHandler">点 击 授 权</button>
+<view>请登录</view>
+<button type="primary" open-type="getUserInfo" bindgetuserinfo="userInfoHandler">微信快捷登录</button>
+<button bindtap="close">取消</button>
+<view class="ad-banner">
+  <ad unit-id="adunit-499feca899514736"></ad>
+</view>

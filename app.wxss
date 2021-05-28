@@ -17,3 +17,7 @@ text {
   margin-top: 10rpx;
   margin-bottom: 10rpx;
 }
+
+.ad-banner {
+  margin-top:10rpx;
+}

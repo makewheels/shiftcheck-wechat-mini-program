@@ -3,3 +3,6 @@
   <text class="currentBanzu">五班三倒：{{wbsdCurrent}}</text>
   <button bindtap="wbsd" type="default">修改默认班组</button>
 </view>
+<view class="ad-banner">
+  <ad unit-id="adunit-499feca899514736"></ad>
+</view>

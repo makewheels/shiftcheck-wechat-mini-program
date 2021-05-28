@@ -8,6 +8,7 @@ Page({
 
   onLoad: function() {
     mta.Page.init()
+    wx.showShareMenu()
   },
 
   //加载当前规则名

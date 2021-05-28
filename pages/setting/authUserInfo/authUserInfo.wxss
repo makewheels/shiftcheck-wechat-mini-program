@@ -6,5 +6,9 @@ view {
 }
 
 button {
-  margin-top: 100rpx;
+  margin-top: 70rpx;
+}
+
+ad{
+  margin-top: 300rpx;
 }

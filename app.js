@@ -9,9 +9,9 @@ AV.init({
 App({
   globalData: {
     //小程序版本号
-    mpVersion: "2.2.1",
+    appVersion: "2.3.0",
     userInfo: null,
-    scene: 0
+    launchScene: {}
   },
 
   getUserInfo: function(cb) {
@@ -33,23 +33,38 @@ App({
     }
   },
 
-  onLaunch: function(scene) {
+  //检查更新
+  checkAppUpdate: function() {
+
+  },
+
+  onLaunch: function (launchScene) {
     //调用API从本地缓存中获取数据
     var logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
-    this.globalData = scene
-    //mtawiid
+    this.globalData.launchScene = launchScene
+    //mta初始化
     mta.App.init({
       "appID": "500623733",
       "eventID": "500623763",
       "statPullDownFresh": true,
       "statShareApp": true,
       "statReachBottom": true,
-      "lauchOpts": scene
+      "lauchOpts": launchScene
     });
     //leancloud登录
     AV.User.loginWithWeapp();
     this.getUserInfo()
   }
 })
+
+/**
+ * 版本更新日志
+ * 
+ * 2.3.0
+ * 开通广告，加入广告
+ * 查询ip的key更新
+ * 检查更新，如有更新，自动更新
+ * 
+ */
