@@ -7,6 +7,9 @@
   <text>{{r5}}</text>
   <text>{{r6}}</text>
   <text>{{r7}}</text>
+  <picker mode="date" bindchange="bindDateChange">
+    <button>跳转到指定日期</button>
+  </picker>
   <view class="flex-wrap">
     <button bindtap="backDay">前 一 天</button>
     <button bindtap="nextDay">后 一 天</button>

@@ -5,6 +5,6 @@
   <button bindtap="toWorkerDefaultBanzu" type="default">个人模式默认班组</button>
   <button bindtap="toPushHome" type="default">订阅上班推送</button>
   <!--<button bindtap="toFeedback">反 馈</button>-->
-  <text class='tail'>version:2.2.1</text>
+  <text class='tail'>version:2.2.2</text>
   <text class='tail'>由衷地感谢您的支持！</text>
 </view>
