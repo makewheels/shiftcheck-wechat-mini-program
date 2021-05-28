@@ -1,13 +1,15 @@
- 可在上班前一天推送消息提醒您，或许还会附带，次日天气预报，敬请期待
 <view class="container">
   <text id="title">订阅上班推送</text>
-  <view class="flex-wrap">
+  <text class="row">邮件剩余：{{restMailTimes}} 封</text>
+  <text class="row">短信剩余：{{restSmsTimes}} 条</text>
+  <view id="mailSwitch" class="flex-wrap">
     <text class="row">邮件开关<text class="switchColor">（{{currentMail}}）</text></text>
-    <switch bindchange="mailSwitch" checked="{{mailChecked}}"/>
+    <switch bindchange="mailSwitch" checked="{{mailChecked}}" />
   </view>
   <view class=" flex-wrap ">
     <text class="row ">短信开关<text class="switchColor ">（{{currentSms}}）</text></text>
-    <switch bindchange="smsSwitch " checked="{{smsChecked}}"/>
+    <switch bindchange="smsSwitch" checked="{{smsChecked}}" />
   </view>
-  <button bindtap="toSetPush" type="default">设 置 推 送</button>
+  <button bindtap="toNewPush" type="default">新增推送任务</button>
+  <text class="row">已有推送任务：</text>
 </view>

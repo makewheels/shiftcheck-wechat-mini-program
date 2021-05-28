@@ -1,6 +1,7 @@
 <text id="warn">注意，规则激活码：\n1、只能用一次\n2、激活成功与微信绑定</text>
 <button bindtap="scan">扫描二维码</button>
 <view>
-  <input type='number' placeholder="或输入激活码" bindinput="bindKeyInput"></input>
-  <button type='primary' bindtap="input">激 活</button>
+  <input type='number' placeholder="或输入激活码" bindinput="bindKeyInput" value="{{pasteValue}}"></input>
+  <button bindtap="paste">一键粘贴</button>
+  <button type='primary' bindtap="active">激 活</button>
 </view>

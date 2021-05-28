@@ -21,6 +21,11 @@ Page({
 
   //加载json进来
   onShow: function (options) {
+    wx.showToast({
+      title: '请稍候',
+      icon: 'loading',
+      duration: 20000
+    });
     var that = this
     var openid = AV.User.current().toJSON().authData.lc_weapp.openid
     var queryUserRule = new AV.Query('UserRule');
@@ -69,6 +74,7 @@ Page({
       r0: this.data.json.banList
     })
     this.setText()
+    wx.hideToast()
   },
 
   /**
@@ -197,7 +203,7 @@ Page({
     var date2 = new Date(this.data.year, this.data.month, this.data.day)
     var daysBetween = parseInt(Math.abs(date2 - date1) / 1000 / 60 / 60 / 24)
     // console.log(this.data.day + "day")
-    console.log("daysBetween" + daysBetween)
+    // console.log("daysBetween" + daysBetween)
     return daysBetween
   },
 

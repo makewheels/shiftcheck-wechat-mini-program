@@ -196,6 +196,12 @@ Page({
 
   //跳转到我的DIY规则页面
   toMyDiy: function () {
+    var that = this
+    wx.showToast({
+      title: '请稍候',
+      icon: 'loading',
+      duration: 20000
+    });
     var query = new AV.Query('UserRule');
     query.equalTo('openid', AV.User.current().toJSON().authData.lc_weapp.openid);
     query.find().then(function (userRules) {
@@ -205,6 +211,7 @@ Page({
           content: '尚未导入规则！',
           showCancel: false
         })
+        wx.hideToast()
       } else {
         wx.navigateTo({
           url: '../diy/diy'

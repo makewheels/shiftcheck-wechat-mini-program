@@ -34,6 +34,11 @@ Page({
         showCancel: false
       })
     } else {
+      wx.showToast({
+        title: '请稍候',
+        icon: 'loading',
+        duration: 20000
+      });
       //暂且认为输入正确
       var query = new AV.Query('WechatUser');
       query.equalTo('openid', openid);
@@ -42,6 +47,7 @@ Page({
         var user = AV.Object.createWithoutData('WechatUser', id);
         user.set('mail', input);
         user.save();
+        wx.hideToast()
         wx.navigateBack({})
         wx.showModal({
           title: '提示',

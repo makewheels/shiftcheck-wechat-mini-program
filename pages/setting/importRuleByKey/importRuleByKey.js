@@ -2,7 +2,8 @@ const AV = require('../../../libs/av-weapp-min.js');
 
 Page({
   data: {
-    inputValue: ""
+    inputValue: "",
+    pasteValue: ""
   },
 
   bindKeyInput: function (e) {
@@ -21,14 +22,31 @@ Page({
     })
   },
 
-  //手动输入
-  input: function () {
-    var key = this.data.inputValue
-    this.importRule(key)
+  //一键粘贴按钮
+  paste: function () {
+    var that = this
+    wx.getClipboardData({
+      success: function (clipboard) {
+        that.setData({
+          pasteValue: clipboard.data,
+          inputValue: clipboard.data
+        })
+      }
+    });
   },
 
-  //激活
+  //激活按钮
+  active: function () {
+    this.importRule(this.data.inputValue)
+  },
+
+  //激活代码
   importRule: function (key) {
+    wx.showToast({
+      title: '请稍候',
+      icon: 'loading',
+      duration: 20000
+    });
     //先查询此key
     var query = new AV.Query('RuleKey');
     query.equalTo('ruleKey', key);
@@ -40,6 +58,7 @@ Page({
           content: '激活码错误！',
           showCancel: false
         })
+        wx.hideToast()
       } else {
         //激活码有效
         var ruleKey = ruleKeys[0]
@@ -50,13 +69,18 @@ Page({
             content: '该激活码已使用！',
             showCancel: false
           })
+          wx.hideToast()
           return
         }
         //一次性使用，设置为，用过了
+        //保存openid，记录是谁激活的
+        //记录时间
+        var openid = AV.User.current().toJSON().authData.lc_weapp.openid
         var obj = AV.Object.createWithoutData('RuleKey', ruleKey.id);
         obj.set('state', 1);
+        obj.set('openid', openid)
+        obj.set('time', new Date().getTime() + "")
         obj.save();
-        var openid = AV.User.current().toJSON().authData.lc_weapp.openid
         //查询UserRule
         var queryUserRule = new AV.Query('UserRule');
         queryUserRule.equalTo('openid', openid);
@@ -79,6 +103,7 @@ Page({
             content: '激活成功！',
             showCancel: false
           })
+          wx.hideToast()
           //存储设置，默认打开自定义页
           wx.setStorage({
             key: 'homepage',
@@ -93,6 +118,7 @@ Page({
         content: '激活过程发生错误！',
         showCancel: false
       })
+      wx.hideToast()
     });
   }
 })

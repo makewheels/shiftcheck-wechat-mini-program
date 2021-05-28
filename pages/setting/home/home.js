@@ -45,11 +45,17 @@ Page({
 
   //订阅上班推送
   toPushHome: function () {
+    wx.showToast({
+      title: '请稍候',
+      icon: 'loading',
+      duration: 20000
+    });
     var that = this
     var query = new AV.Query('WechatUser');
     query.equalTo('openid', AV.User.current().toJSON().authData.lc_weapp.openid);
     query.find().then(function (users) {
       if (users.length == 0 || users[0].get('mail') == undefined || users[0].get('mail') == "") {
+        wx.hideToast()
         wx.navigateTo({
           url: '../accountHome/accountHome',
         })

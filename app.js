@@ -7,6 +7,8 @@ AV.init({
 
 App({
   globalData: {
+    //小程序版本号
+    mpVersion: "2.2.1",
     userInfo: null,
     scene: 0
   },

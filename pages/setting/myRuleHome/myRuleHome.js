@@ -7,6 +7,14 @@ Page({
 
   //加载当前规则名
   onShow: function () {
+    this.setData({
+      currentRuleName: "loading..."
+    })
+    wx.showToast({
+      title: '请稍候',
+      icon: 'loading',
+      duration: 20000
+    });
     var that = this
     var openid = AV.User.current().toJSON().authData.lc_weapp.openid
     var queryUserRule = new AV.Query('UserRule');
@@ -39,6 +47,7 @@ Page({
           currentRuleName: "尚未导入规则"
         })
       }
+      wx.hideToast()
     });
   },
 
@@ -50,6 +59,11 @@ Page({
 
   //删除规则
   deleteRule: function () {
+    wx.showToast({
+      title: '请稍候',
+      icon: 'loading',
+      duration: 20000
+    });
     var that = this
     var query = new AV.Query('UserRule');
     query.equalTo('openid', AV.User.current().toJSON().authData.lc_weapp.openid);
@@ -61,18 +75,37 @@ Page({
           content: '尚未导入规则！',
           showCancel: false
         })
+        wx.hideToast()
       } else {
+        wx.hideToast()
         //如果已存规则
-        var userRule = userRules[0]
-        var obj = AV.Object.createWithoutData('UserRule', userRule.id);
-        obj.destroy().then(function (success) {
-          // 删除成功
-          wx.showModal({
-            title: '提示',
-            content: '删除成功！',
-            showCancel: false
-          })
-          that.onShow()
+        //先确认
+        wx.showModal({
+          title: '警告',
+          content: '删除后不可恢复！',
+          confirmText: '确认删除',
+          success: function (res) {
+            if (res.confirm) {
+              wx.showToast({
+                title: '请稍候',
+                icon: 'loading',
+                duration: 20000
+              });
+              var userRule = userRules[0]
+              var obj = AV.Object.createWithoutData('UserRule', userRule.id);
+              obj.destroy().then(function (success) {
+                // 删除成功
+                wx.hideToast()
+                wx.showModal({
+                  title: '提示',
+                  content: '删除成功！',
+                  showCancel: false
+                })
+                //刷新显示
+                that.onShow()
+              })
+            }
+          }
         })
       }
     });

@@ -23,6 +23,19 @@ Page({
     var that = this
     var input = this.data.inputValue
     var openid = AV.User.current().toJSON().authData.lc_weapp.openid
+    if (input.length != 11) {
+      wx.showModal({
+        title: '提示',
+        content: '请输入正确的手机号！',
+        showCancel: false
+      })
+      return
+    }
+    wx.showToast({
+      title: '请稍候',
+      icon: 'loading',
+      duration: 20000
+    });
     var query = new AV.Query('WechatUser');
     query.equalTo('openid', openid);
     query.find().then(function (users) {
@@ -36,6 +49,7 @@ Page({
         content: '手机' + that.data.setOrUpdate + '成功！',
         showCancel: false
       })
+      wx.hideToast()
       //给客户发送邮件
       AV.Cloud.run('sendWelcomeMail', {
         to: users[0].get('mail')

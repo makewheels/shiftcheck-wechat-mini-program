@@ -33,6 +33,7 @@ button {
 }
 
 text {
+  padding-top: 8rpx;
   line-height: 100rpx;
 }
 

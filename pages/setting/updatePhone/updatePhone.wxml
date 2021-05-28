@@ -1,2 +1,2 @@
-<input placeholder="输入您的手机" bindinput="bindKeyInput"></input>
+<input type="number" placeholder="输入您的手机" bindinput="bindKeyInput"></input>
 <button type='primary' bindtap="input">{{setOrUpdate}}手机</button>
