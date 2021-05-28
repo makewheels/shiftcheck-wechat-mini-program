@@ -1,0 +1,25 @@
+.container {
+  padding-top: 5rpx;
+}
+
+.flex-wrap {
+  display: -webkit-flex;
+}
+
+#title {
+  font-size: 60rpx;
+  margin-bottom: 30rpx;
+}
+
+button {
+  margin-top: 10rpx;
+  margin-bottom: 10rpx;
+  width: 500rpx;
+  height: 100rpx;
+  line-height: 100rpx;
+}
+
+.currentBanzu {
+  color: red;
+  font-size: 50rpx;
+}

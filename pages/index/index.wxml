@@ -1,4 +1,3 @@
-<!--index.wxml-->
 <view class="container">
   <view class="title">乔彬原创：查班神器</view>
   <span>热电厂：</span>
@@ -18,8 +17,7 @@
     <button bindtap="toSbbdWorker" type="primary">个 人</button>
     <button bindtap="toSbbdDirector" type="primary">总 览</button>
   </view>
-  <view id="description">
-    <view>由衷地感谢您的支持！</view>
+  <view>
+    <button id="btn_setting" bindtap="toSettingHome" type="default">设 置</button>
   </view>
-  <view>version:2.0.1</view>
 </view>

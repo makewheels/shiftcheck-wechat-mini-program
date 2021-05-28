@@ -8,8 +8,6 @@ AV.init({
 App({
   globalData: {
     userInfo: null,
-    workerModeName: "个人",
-    directorModeName: "总览",
     scene: 0
   },
 
@@ -40,5 +38,6 @@ App({
     this.globalData = scene
     //leancloud登录
     AV.User.loginWithWeapp();
+    this.getUserInfo()
   }
 })

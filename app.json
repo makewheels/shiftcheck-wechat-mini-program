@@ -7,12 +7,15 @@
     "pages/sbsd/director/director",
     "pages/sbsd/worker/worker",
     "pages/sbbd/director/director",
-    "pages/sbbd/worker/worker"
+    "pages/sbbd/worker/worker",
+    "pages/setting/home/home",
+    "pages/setting/workerDefaultBanzu/workerDefaultBanzu",
+    "pages/setting/myRule/myRule"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#98f5ff",
-    "navigationBarTitleText": "查班神器：微信小程序",
+    "navigationBarTitleText": "查班神器",
     "navigationBarTextStyle": "black"
   }
 }

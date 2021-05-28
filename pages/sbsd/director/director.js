@@ -5,7 +5,7 @@ Page({
    */
   data: {
     //模式名
-    modeName: "",
+    modeName: "总览",
     //记录最上面一行的年月日
     year: 0,
     month: 0,
@@ -21,9 +21,6 @@ Page({
   },
 
   onLoad: function () {
-    this.setData({
-      modeName: getApp().globalData.directorModeName
-    })
     var date = new Date()
     this.setData({
       year: date.getFullYear(),

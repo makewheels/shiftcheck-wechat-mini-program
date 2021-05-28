@@ -5,7 +5,7 @@ Page({
    */
   data: {
     //模式名
-    modeName: "",
+    modeName: "个人",
     //当前班组代号
     banzuId: 0,
     //当前班组名字
@@ -25,9 +25,6 @@ Page({
   },
 
   onLoad: function () {
-    this.setData({
-      modeName: getApp().globalData.workerModeName
-    })
     //初始化班组
     this.setBanzu1()
     //初始化时间

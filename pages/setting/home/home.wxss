@@ -1,0 +1,20 @@
+.container {
+  padding-top: 20rpx;
+}
+
+.flex-wrap {
+  display: -webkit-flex;
+}
+
+#title {
+  font-size: 60rpx;
+  margin-bottom: 20rpx;
+}
+
+button {
+  margin-top: 20rpx;
+  margin-bottom: 20rpx;
+  width: 500rpx;
+  height: 100rpx;
+  line-height: 100rpx;
+}

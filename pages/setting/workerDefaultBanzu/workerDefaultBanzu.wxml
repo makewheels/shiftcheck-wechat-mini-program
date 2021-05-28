@@ -1,0 +1,5 @@
+<view class="container">
+  <text id="title">个人模式默认班组</text>
+  <text class="currentBanzu">五班三倒：{{wbsdCurrent}}</text>
+  <button bindtap="wbsd" type="default">修改默认班组</button>
+</view>
