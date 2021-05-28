@@ -1,0 +1,8 @@
+<view class="container">
+  <text id="title">我的DIY规则</text>
+  <text class="row">当前规则：</text>
+  <text id="currentRuleName">{{currentRuleName}}</text>
+</view>
+<button bindtap="toImportRuleByKey">激活码导入</button>
+<button bindtap="deleteRule">删除已有规则</button>
+<!-- <button bindtap="setHomepage">主页默认打开页面</button> -->

@@ -1,10 +1,10 @@
 Page({
   data: {
-    wbsdCurrent: ""
+    wbsdCurrent: "loading..."
   },
 
   //先加载已保存的设置中的内容
-  onReady: function () {
+  onLoad: function () {
     var wbsdSaved = wx.getStorageSync('setting-wbsdDefault')
     if (wbsdSaved == undefined) {
       this.setData({
@@ -75,7 +75,7 @@ Page({
           })
         }
         wx.showToast({
-          title: '已设成' + banzuStr + "!"
+          title: '已设为' + banzuStr + "!"
         })
       }
     })

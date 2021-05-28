@@ -10,7 +10,15 @@
     "pages/sbbd/worker/worker",
     "pages/setting/home/home",
     "pages/setting/workerDefaultBanzu/workerDefaultBanzu",
-    "pages/setting/myRule/myRule"
+    "pages/setting/myRuleHome/myRuleHome",
+    "pages/setting/importRuleByKey/importRuleByKey",
+    "pages/setting/pushHome/pushHome",
+    "pages/setting/feedback/feedback",
+    "pages/setting/authUserInfo/authUserInfo",
+    "pages/setting/accountHome/accountHome",
+    "pages/setting/updateMail/updateMail",
+    "pages/setting/updatePhone/updatePhone",
+    "pages/diy/diy"
   ],
   "window": {
     "backgroundTextStyle": "light",

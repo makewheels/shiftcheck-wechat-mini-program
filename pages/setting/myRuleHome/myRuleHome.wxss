@@ -1,0 +1,28 @@
+button {
+  margin-top: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.container {
+  padding-top: 5rpx;
+}
+
+#title {
+  font-size: 60rpx;
+  margin-bottom: 20rpx;
+}
+
+.flex-wrap {
+  display: -webkit-flex;
+}
+
+.row {
+  font-size: 50rpx;
+  margin-bottom: 13rpx;
+}
+
+#currentRuleName {
+  color: red;
+  font-size: 50rpx;
+  margin-bottom: 13rpx;
+}

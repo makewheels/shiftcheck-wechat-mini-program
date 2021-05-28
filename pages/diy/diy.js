@@ -1,11 +1,14 @@
+const AV = require('../../libs/av-weapp-min.js');
+
 Page({
   data: {
-    //模式名
-    modeName: "总览",
+    currentRuleName: "loading...",
+    json: null,
     //记录最上面一行的年月日
     year: 0,
     month: 0,
     day: 0,
+    r0: "loading...",
     //七行数据
     r1: "loading...",
     r2: "loading...",
@@ -16,19 +19,61 @@ Page({
     r7: "loading..."
   },
 
-  onLoad: function () {
+  //加载json进来
+  onShow: function (options) {
+    var that = this
+    var openid = AV.User.current().toJSON().authData.lc_weapp.openid
+    var queryUserRule = new AV.Query('UserRule');
+    queryUserRule.equalTo('openid', openid);
+    queryUserRule.find().then(function (userRules) {
+      //如果能查到该用户的对应规则
+      if (userRules.length == 1) {
+        //多表联查，继续差规则表，看名字是什么
+        var ruleId = userRules[0].get('ruleId')
+        var queryRule = new AV.Query('Rule');
+        queryRule.equalTo('ruleId', ruleId);
+        queryRule.find().then(function (rules) {
+          //如果查到了该规则
+          if (rules.length == 1) {
+            var jsonStr = rules[0].get('json')
+            var jsonObj = JSON.parse(jsonStr)
+            that.setData({
+              currentRuleName: jsonObj.showName,
+              json: jsonObj
+            })
+            that.loadData()
+          } else {
+            //如果没查到改规则
+            that.setData({
+              currentRuleName: "尚未导入规则"
+            })
+          }
+        });
+      } else {
+        //如果查不到该用户的对应规则
+        that.setData({
+          currentRuleName: "尚未导入规则"
+        })
+      }
+    });
+  },
+
+  //解析json
+  loadData: function () {
+    var that = this
     var date = new Date()
     this.setData({
       year: date.getFullYear(),
       month: date.getMonth(),
-      day: date.getDate()
+      day: date.getDate(),
+      r0: this.data.json.banList
     })
     this.setText()
   },
 
   /**
-   * 返回主页
-   */
+    * 返回主页
+    */
   close: function () {
     wx.navigateBack({})
   },
@@ -116,17 +161,44 @@ Page({
    * 获得一行内容
    */
   getRow: function () {
-    return this.getDateString() + this.getYizhi() + "、" + this.getErzhi() + "、" + this.getSanzhi()
+    var dateStr = this.getDateString()
+    var banzuList = this.data.json.banzuList
+    var periodList = this.data.json.periodList
+    var restName = this.data.json.restName
+    var remainder = this.getTotalDays() % periodList.length
+    //一天的班组索引，例如：4,0,0
+    var banzuIndex = periodList[remainder]
+    var banzuIndexArr = banzuIndex.split(",")
+    var rowStr = ""
+    for (var i = 0; i < banzuIndexArr.length; i++) {
+      if (banzuIndexArr[i] == 0) {
+        rowStr = rowStr + restName
+      } else {
+        rowStr = rowStr + banzuList[banzuIndexArr[i]]
+      }
+      if (i != banzuIndexArr.length - 1) {
+        rowStr = rowStr + "、"
+      }
+    }
+    return dateStr + rowStr
   },
 
   /**
    * 两个日期间相差天数
    */
   getTotalDays: function () {
-    var date1 = new Date(2016, 6, 7);
+    var that = this
+    var json = that.data.json
+    var startDateArr = json.startDate.split("-")
+    var year = parseInt(startDateArr[0])
+    var month = parseInt(startDateArr[1]) - 1
+    var day = parseInt(startDateArr[2])
+    var date1 = new Date(year, month, day);
     var date2 = new Date(this.data.year, this.data.month, this.data.day)
-    var days = parseInt(Math.abs(date2 - date1) / 1000 / 60 / 60 / 24)
-    return days
+    var daysBetween = parseInt(Math.abs(date2 - date1) / 1000 / 60 / 60 / 24)
+    // console.log(this.data.day + "day")
+    console.log("daysBetween" + daysBetween)
+    return daysBetween
   },
 
   /**
@@ -134,7 +206,7 @@ Page({
    */
   getDateString: function () {
     var date = new Date(this.data.year, this.data.month, this.data.day)
-    var week
+    var week = ""
     var weekNum = date.getDay()
     if (weekNum == 1) {
       week = "周一"
@@ -152,62 +224,5 @@ Page({
       week = "周天"
     }
     return week + (date.getMonth() + 1) + "月" + date.getDate() + "日："
-  },
-
-  /**
-   * 指定日期一值是哪个班组
-   */
-  getYizhi: function () {
-    var total = this.getTotalDays()
-    var remainder = total % 5
-    if (remainder == 0) {
-      return "一班"
-    } else if (remainder == 1) {
-      return "二班"
-    } else if (remainder == 2) {
-      return "三班"
-    } else if (remainder == 3) {
-      return "四班"
-    } else {
-      return "五班"
-    }
-  },
-
-  /**
-   * 指定日期二值是哪个班组
-   */
-  getErzhi: function () {
-    var total = this.getTotalDays()
-    var remainder = total % 5
-    if (remainder == 0) {
-      return "三班"
-    } else if (remainder == 1) {
-      return "四班"
-    } else if (remainder == 2) {
-      return "五班"
-    } else if (remainder == 3) {
-      return "一班"
-    } else {
-      return "二班"
-    }
-  },
-
-  /**
-   * 指定日期三值是哪个班组
-   */
-  getSanzhi: function () {
-    var total = this.getTotalDays()
-    var remainder = total % 5
-    if (remainder == 0) {
-      return "五班"
-    } else if (remainder == 1) {
-      return "一班"
-    } else if (remainder == 2) {
-      return "二班"
-    } else if (remainder == 3) {
-      return "三班"
-    } else {
-      return "四班"
-    }
   }
 })

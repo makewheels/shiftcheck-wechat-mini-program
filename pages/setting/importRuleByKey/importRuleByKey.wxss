@@ -1,0 +1,17 @@
+#warn {
+  color: red;
+}
+
+input {
+  height: 150rpx;
+  padding-left: 50rpx;
+  margin-top: 20rpx;
+  margin-bottom: 30rpx;
+  font-size: 70rpx;
+  background-color: yellow;
+}
+
+button {
+  margin-top: 20rpx;
+  margin-bottom: 20rpx;
+}

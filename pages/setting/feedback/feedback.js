@@ -1,4 +1,4 @@
-// pages/setting/myRule/myRule.js
+// pages/setting/feedback/feedback.js
 Page({
 
   /**

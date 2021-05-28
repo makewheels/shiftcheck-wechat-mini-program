@@ -1,15 +1,52 @@
-const AV = require('../../libs/av-weapp-min.js');
+const AV = require('../../../libs/av-weapp-min.js');
 var UseMessage = AV.Object.extend('UseMessage');
 var Avatar = AV.Object.extend('Avatar');
 var app = getApp()
 
 Page({
   data: {
-    lastTimestamp: 0
+    success: '',
+    fail: ''
   },
 
-  //我的获取本次使用信息
-  onShow: function () {
+  //需要传入，授权成功和失败，跳转的路径
+  onLoad: function (options) {
+    this.setData({
+      success: options.success,
+      fail: options.fail
+    })
+  },
+
+  //授权用户信息方法
+  userInfoHandler: function () {
+    var that = this
+    wx.getSetting({
+      success: (res) => {
+        var isAuth = res.authSetting['scope.userInfo']
+        //如果授权成功
+        if (isAuth) {
+          wx.redirectTo({
+            url: this.data.success
+          })
+          //调用上传使用信息
+          that.uploadUseMessage()
+        } else {
+          wx.navigateBack({})
+          //如果授权失败
+          wx.redirectTo({
+            url: this.data.fail
+          })
+          wx.showModal({
+            title: '提示',
+            content: '授权失败，无法使用',
+            showCancel: false
+          })
+        }
+      }
+    })
+  },
+
+  uploadUseMessage: function () {
     //如果刚刚已经开过了
     if (this.data.lastTimestamp != 0) {
       var diffTimestamp = new Date().getTime() - this.data.lastTimestamp
@@ -84,7 +121,6 @@ Page({
     })
   },
 
-  //mystep2
   mystep2: function (time, userInfo, myAvatarUrl, wxnet) {
     var user = AV.User.current().toJSON()
     var openid = AV.User.current().toJSON().authData.lc_weapp.openid
@@ -143,73 +179,5 @@ Page({
         })
       }
     });
-  },
-
-  //事件处理函数
-  bindViewTap: function () {
-    wx.navigateTo({
-      url: '../logs/logs'
-    })
-  },
-
-  toWbsdWorker: function () {
-    wx.navigateTo({
-      url: '../wbsd/worker/worker'
-    })
-  },
-
-  toWbsdDirector: function () {
-    wx.navigateTo({
-      url: '../wbsd/director/director'
-    })
-  },
-
-  toSbsdWorker: function () {
-    wx.navigateTo({
-      url: '../sbsd/worker/worker'
-    })
-  },
-
-  toSbsdDirector: function () {
-    wx.navigateTo({
-      url: '../sbsd/director/director'
-    })
-  },
-
-  toSbbdWorker: function () {
-    wx.navigateTo({
-      url: '../sbbd/worker/worker'
-    })
-  },
-
-  toSbbdDirector: function () {
-    wx.navigateTo({
-      url: '../sbbd/director/director'
-    })
-  },
-
-  toSettingHome: function () {
-    wx.navigateTo({
-      url: '../setting/home/home'
-    })
-  },
-
-  //跳转到我的DIY规则页面
-  toMyDiy: function () {
-    var query = new AV.Query('UserRule');
-    query.equalTo('openid', AV.User.current().toJSON().authData.lc_weapp.openid);
-    query.find().then(function (userRules) {
-      if (userRules.length == 0) {
-        wx.showModal({
-          title: '提示',
-          content: '尚未导入规则！',
-          showCancel: false
-        })
-      } else {
-        wx.navigateTo({
-          url: '../diy/diy'
-        })
-      }
-    })
   }
 })

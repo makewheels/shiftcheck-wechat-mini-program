@@ -11,13 +11,13 @@ Page({
     month: 0,
     day: 0,
     //七行数据
-    r1: "",
-    r2: "",
-    r3: "",
-    r4: "",
-    r5: "",
-    r6: "",
-    r7: "",
+    r1: "loading...",
+    r2: "loading...",
+    r3: "loading...",
+    r4: "loading...",
+    r5: "loading...",
+    r6: "loading...",
+    r7: "loading...",
   },
 
   onLoad: function () {

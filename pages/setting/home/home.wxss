@@ -14,7 +14,13 @@
 button {
   margin-top: 20rpx;
   margin-bottom: 20rpx;
-  width: 500rpx;
+  width: 600rpx;
   height: 100rpx;
   line-height: 100rpx;
+}
+
+.tail {
+  padding-left: 50rpx;
+  padding-right: 50rpx;
+  color: blue;
 }

@@ -1,0 +1,2 @@
+<view>您需要授权用户信息才可使用</view>
+<button type="primary" open-type="getUserInfo" bindgetuserinfo="userInfoHandler">点 击 授 权</button>

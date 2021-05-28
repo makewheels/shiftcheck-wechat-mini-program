@@ -12,14 +12,26 @@
 }
 
 button {
-  margin-top: 10rpx;
+  margin-top: 30rpx;
   margin-bottom: 10rpx;
   width: 600rpx;
   height: 100rpx;
   line-height: 100rpx;
 }
 
-.currentBanzu {
+.row {
+  font-size: 45rpx;
+  margin-top: 25rpx;
+  margin-bottom: 13rpx;
+}
+
+switch {
+  margin-left: 30rpx;
+  margin-top: 30rpx;
+  margin-bottom: 30rpx;
+}
+
+.switchColor {
+  font-size: 45rpx;
   color: red;
-  font-size: 50rpx;
 }

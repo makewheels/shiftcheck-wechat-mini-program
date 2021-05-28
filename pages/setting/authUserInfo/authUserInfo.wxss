@@ -1,0 +1,10 @@
+view {
+  font-size: 50rpx;
+  margin-left: 10rpx;
+  margin-top: 100rpx;
+  margin-bottom: 50rpx;
+}
+
+button {
+  margin-top: 100rpx;
+}

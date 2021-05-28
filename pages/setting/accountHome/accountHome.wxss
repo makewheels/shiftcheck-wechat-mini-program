@@ -19,7 +19,19 @@ button {
   line-height: 100rpx;
 }
 
-.currentBanzu {
+#mail {
+  margin-top: 50rpx;
   color: red;
   font-size: 50rpx;
+}
+
+#phone {
+  margin-top: 50rpx;
+  color: red;
+  font-size: 50rpx;
+}
+
+.row {
+  font-size: 45rpx;
+  margin-bottom: 13rpx;
 }

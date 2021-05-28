@@ -1,0 +1,8 @@
+input {
+  height: 150rpx;
+  padding-left: 30rpx;
+  margin-top: 100rpx;
+  margin-bottom: 80rpx;
+  font-size: 70rpx;
+  background-color: yellow;
+}

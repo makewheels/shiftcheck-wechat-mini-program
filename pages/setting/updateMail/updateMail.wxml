@@ -1,0 +1,2 @@
+<input placeholder="输入您的邮箱" bindinput="bindKeyInput"></input>
+<button type='primary' bindtap="input">{{setOrUpdate}}邮箱</button>

@@ -1,12 +1,13 @@
 <view class="container">
   <view class="title">乔彬原创：查班神器</view>
-  <span>热电厂：</span>
+  <button bindtap="toMyDiy" type="warn" id="myDiy">我 的 D I Y 规 则</button>
+  <span>热 电 厂：</span>
   <view class="flex-wrap">
     <text>五班三倒：</text>
     <button bindtap="toWbsdWorker" hover-class="hover">个 人</button>
     <button bindtap="toWbsdDirector" hover-class="hover">总 览</button>
   </view>
-  <span>采油队：</span>
+  <span>采 油 队：</span>
   <view class="flex-wrap">
     <text>四班四倒：</text>
     <button bindtap="toSbsdWorker" type="primary">个 人</button>

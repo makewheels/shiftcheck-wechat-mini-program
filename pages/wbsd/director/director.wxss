@@ -1,5 +1,7 @@
 .container {
-  padding: 100rpx 0;
+
+  padding-top: 25rpx;
+  padding-bottom: 10rpx;
 }
 
 .subtitle {

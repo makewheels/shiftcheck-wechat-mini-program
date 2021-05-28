@@ -1,0 +1,8 @@
+<view class="container">
+  <text id="title">我的账户</text>
+  <text class="row">邮箱手机可用于 上班提醒推送</text>
+  <text id="mail">邮箱：{{mail}}</text>
+  <button bindtap="toSetMail" type="default">{{setOrUpdate}}邮箱</button>
+  <text id="phone">手机：{{phone}}</text>
+  <button bindtap="toSetPhone" type="default">{{setOrUpdate}}手机</button>
+</view>
