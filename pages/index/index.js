@@ -16,22 +16,6 @@ Page({
   onLoad: function() {
     mta.Page.init()
     wx.showShareMenu()
-
-    // 在页面onLoad回调事件中创建激励视频广告实例
-    if (wx.createRewardedVideoAd) {
-      videoAd = wx.createRewardedVideoAd({
-        adUnitId: 'adunit-79ec0f8be5efc0f1'
-      })
-      videoAd.onLoad(() => {
-        console.log('onLoad')
-      })
-      videoAd.onError((err) => {
-        console.log('onError')
-      })
-      videoAd.onClose((res) => {
-        console.log('onClose ' + res)
-      })
-    }
   },
 
   //我的获取本次使用信息

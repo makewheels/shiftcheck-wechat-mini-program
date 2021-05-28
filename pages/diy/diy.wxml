@@ -1,5 +1,6 @@
 <view class="container">
   <view class="subtitle">{{currentRuleName}}</view>
+  <button bindtap="toDiyPush">自定义规则提醒</button>
   <text>{{r0}}</text>
   <text>{{r1}}</text>
   <text>{{r2}}</text>
@@ -21,6 +22,6 @@
     <button bindtap="close" type="warn">返回主页</button>
   </view>
   <view class="ad-banner">
-    <ad unit-id="adunit-499feca899514736"></ad>
+    <ad unit-id="adunit-d5a2055026c60752"></ad>
   </view>
 </view>

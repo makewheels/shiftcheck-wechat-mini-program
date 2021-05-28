@@ -1,0 +1,43 @@
+.container {
+  padding-top: 5rpx;
+}
+
+.flex-wrap {
+  display: -webkit-flex;
+}
+
+#title {
+  font-size: 60rpx;
+}
+
+button {
+  margin-top: 30rpx;
+  margin-bottom: 10rpx;
+  width: 600rpx;
+  height: 100rpx;
+  line-height: 100rpx;
+}
+
+.row {
+  font-size: 45rpx;
+  margin-bottom: 7rpx;
+}
+
+switch {
+  margin-left: 15rpx;
+  margin-top: 10rpx;
+  margin-bottom: 10rpx;
+}
+
+.redColor {
+  font-size: 45rpx;
+  color: red;
+}
+
+#mailSwitch {
+  margin-top: 30rpx;
+}
+
+#btn_pushIntroduce {
+  background-color: #7cc;
+}

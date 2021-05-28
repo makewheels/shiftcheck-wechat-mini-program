@@ -18,8 +18,9 @@
     "pages/setting/accountHome/accountHome",
     "pages/setting/updateMail/updateMail",
     "pages/setting/updatePhone/updatePhone",
+    "pages/setting/newPushMission/newPushMission",
     "pages/diy/diy",
-    "pages/setting/newPushMission/newPushMission"
+    "pages/diyPush/diyPush"
   ],
   "window": {
     "backgroundTextStyle": "light",

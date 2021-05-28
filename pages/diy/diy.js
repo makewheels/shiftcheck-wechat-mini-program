@@ -91,6 +91,15 @@ Page({
   },
 
   /**
+   * 前往diy推送页面
+   */
+  toDiyPush: function() {
+    wx.navigateTo({
+      url: '../diyPush/diyPush'
+    })
+  },
+
+  /**
    * 改data中的日期
    */
   changeDate: function(changeDays) {

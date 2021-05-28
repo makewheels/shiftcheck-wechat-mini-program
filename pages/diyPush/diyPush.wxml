@@ -1,0 +1,7 @@
+<view class="container">
+  <text id="title">订阅上班推送</text>
+  <view>
+    <text class="row">剩余提醒次数：{{mailPushTimes}} 次</text>
+  </view>
+  <button bindtap="watchVideo" type="primary">看视频，加次数！</button>
+</view>
