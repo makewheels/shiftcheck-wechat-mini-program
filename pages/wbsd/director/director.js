@@ -1,5 +1,3 @@
-var mta = require('../../../libs/mta_analysis.js')
-
 Page({
   data: {
     //模式名
@@ -19,7 +17,6 @@ Page({
   },
 
   onLoad: function() {
-    mta.Page.init()
     wx.showShareMenu()
     var date = new Date()
     this.setData({

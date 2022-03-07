@@ -1,5 +1,4 @@
-const AV = require('../../libs/av-weapp-min.js');
-var mta = require('../../libs/mta_analysis.js')
+const AV = require('../../libs/av-core-min.js');
 
 let rewardedVideoAd = null
 
@@ -16,7 +15,6 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function(options) {
-    mta.Page.init()
     wx.showShareMenu()
 
     var that = this

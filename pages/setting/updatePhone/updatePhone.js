@@ -1,6 +1,4 @@
-const AV = require('../../../libs/av-weapp-min.js');
-var mta = require('../../../libs/mta_analysis.js')
-
+const AV = require('../../../libs/av-core-min.js');
 Page({
   data: {
     setOrUpdate: "设置",
@@ -8,7 +6,6 @@ Page({
   },
 
   onLoad: function(options) {
-    mta.Page.init()
     wx.showShareMenu()
     this.setData({
       setOrUpdate: options.setOrUpdate

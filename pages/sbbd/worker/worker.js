@@ -1,5 +1,3 @@
-var mta = require('../../../libs/mta_analysis.js')
-
 Page({
   /**
    * 页面的初始数据
@@ -26,7 +24,6 @@ Page({
   },
 
   onLoad: function () {
-    mta.Page.init()
     wx.showShareMenu()
     //初始化班组
     this.setBanzu1()

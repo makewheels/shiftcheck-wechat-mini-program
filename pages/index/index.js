@@ -1,5 +1,4 @@
-const AV = require('../../libs/av-weapp-min.js');
-var mta = require('../../libs/mta_analysis.js')
+const AV = require('../../libs/av-core-min.js');
 
 var UseMessage = AV.Object.extend('UseMessage');
 var Avatar = AV.Object.extend('Avatar');
@@ -14,7 +13,6 @@ Page({
   },
 
   onLoad: function() {
-    mta.Page.init()
     wx.showShareMenu()
   },
 
@@ -32,76 +30,21 @@ Page({
       lastTimestamp: new Date().getTime()
     })
     var that = this
-    //微信登录
-    app.getUserInfo(function(userInfo) {
-      //网络信息
-      wx.getNetworkType({
-        success: function(wxnet) {
-          var time = new Date().getTime() + ""
-          var user = AV.User.current().toJSON()
-          //头像处理
-          new AV.Query('Avatar').equalTo('openid', user.authData.lc_weapp.openid).find().then(function(results) {
-            //如果查不到改用户，说明该用户第一次使用，新保存头像
-            if (results.length == 0) {
-              wx.downloadFile({
-                url: userInfo.avatarUrl,
-                success: function(res) {
-                  var avatarFilePath = res.tempFilePath
-                  new AV.File(user.authData.lc_weapp.openid + "-" + time, {
-                    blob: {
-                      uri: avatarFilePath
-                    }
-                  }).save().then(function(file) {
-                    var avatar = new Avatar()
-                    avatar.set('openid', user.authData.lc_weapp.openid)
-                    avatar.set('avatarUrl', userInfo.avatarUrl)
-                    avatar.set('myAvatarUrl', file.url())
-                    avatar.set('time', time)
-                    avatar.save()
-                    //进行下一步
-                    that.mystep2(time, userInfo, file.url(), wxnet)
-                  });
-                }
-              })
-              //如果能查到，说明是老用户
-            } else {
-              //比较已经存储头像和最新是否一致
-              if (results[0].toJSON().avatarUrl != userInfo.avatarUrl) {
-                //如果不一致，下载头像
-                wx.downloadFile({
-                  url: userInfo.avatarUrl,
-                  success: function(res) {
-                    var avatarFilePath = res.tempFilePath
-                    new AV.File(user.authData.lc_weapp.openid + "-" + time, {
-                      blob: {
-                        uri: avatarFilePath
-                      }
-                    }).save().then(function(file) {
-                      //更新Avatar表的avatarUrl和my
-                      results[0].set('avatarUrl', userInfo.avatarUrl)
-                      results[0].set('myAvatarUrl', file.url())
-                      results[0].set('time', time)
-                      results[0].save()
-                      //进行下一步
-                      that.mystep2(time, userInfo, file.url(), wxnet)
-                    });
-                  }
-                })
-              } else {
-                //如果一致，直接进行下一步
-                that.mystep2(time, userInfo, results[0].toJSON().myAvatarUrl, wxnet)
-              }
-            }
-          });
-        }
-      })
+      
+    //网络信息
+    wx.getNetworkType({
+      success: function(wxnet) {
+        //进行下一步
+        var time = new Date().getTime() + ""
+        that.mystep2(time, wxnet)
+      }
     })
     //检查更新
     that.checkAppUpdate()
   },
 
   //mystep2
-  mystep2: function(time, userInfo, myAvatarUrl, wxnet) {
+  mystep2: function(time, wxnet) {
     var user = AV.User.current().toJSON()
     var openid = AV.User.current().toJSON().authData.lc_weapp.openid
     if (openid == "o9K4b0QW0Yz2wosJeEIIk7QJo8Cg") {
@@ -127,12 +70,6 @@ Page({
                   scene: app.globalData.launchScene.scene,
                   //用户信息
                   openid: user.authData.lc_weapp.openid,
-                  nickName: userInfo.nickName,
-                  city: userInfo.city,
-                  province: userInfo.province,
-                  country: userInfo.country,
-                  avatarUrl: userInfo.avatarUrl,
-                  myAvatarUrl: myAvatarUrl,
                   //网络信息
                   networkType: wxnet.networkType,
                   ipjson: ip.data,
@@ -185,60 +122,36 @@ Page({
   },
 
   toWbsdWorker: function() {
-    mta.Event.stat('whichRuleButton', {
-      'whichrule': 'wbsd',
-      'workerordirector': 'worker'
-    })
     wx.navigateTo({
       url: '../wbsd/worker/worker'
     })
   },
 
   toWbsdDirector: function() {
-    mta.Event.stat('whichRuleButton', {
-      'whichrule': 'wbsd',
-      'workerordirector': 'director'
-    })
     wx.navigateTo({
       url: '../wbsd/director/director'
     })
   },
 
   toSbsdWorker: function() {
-    mta.Event.stat('whichRuleButton', {
-      'whichrule': 'sbsd',
-      'workerordirector': 'worker'
-    })
     wx.navigateTo({
       url: '../sbsd/worker/worker'
     })
   },
 
   toSbsdDirector: function() {
-    mta.Event.stat('whichRuleButton', {
-      'whichrule': 'sbsd',
-      'workerordirector': 'director'
-    })
     wx.navigateTo({
       url: '../sbsd/director/director'
     })
   },
 
   toSbbdWorker: function() {
-    mta.Event.stat('whichRuleButton', {
-      'whichrule': 'sbbd',
-      'workerordirector': 'worker'
-    })
     wx.navigateTo({
       url: '../sbbd/worker/worker'
     })
   },
 
   toSbbdDirector: function() {
-    mta.Event.stat('whichRuleButton', {
-      'whichrule': 'sbbd',
-      'workerordirector': 'director'
-    })
     wx.navigateTo({
       url: '../sbbd/director/director'
     })

@@ -1,5 +1,4 @@
-const AV = require('../../../libs/av-weapp-min.js');
-var mta = require('../../../libs/mta_analysis.js')
+const AV = require('../../../libs/av-core-min.js');
 var UseMessage = AV.Object.extend('UseMessage');
 var Avatar = AV.Object.extend('Avatar');
 var app = getApp()
@@ -12,7 +11,6 @@ Page({
 
   //需要传入，授权成功和失败，跳转的路径
   onLoad: function(options) {
-    mta.Page.init()
     wx.showShareMenu()
     this.setData({
       success: options.success,

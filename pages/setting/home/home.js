@@ -1,12 +1,10 @@
-const AV = require('../../../libs/av-weapp-min.js');
-var mta = require('../../../libs/mta_analysis.js')
+const AV = require('../../../libs/av-core-min.js');
 var app = getApp()
 
 Page({
   data: {},
 
   onLoad: function() {
-    mta.Page.init()
     wx.showShareMenu()
     this.setData({
       appVersion: app.globalData.appVersion

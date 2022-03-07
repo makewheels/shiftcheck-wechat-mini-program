@@ -1,5 +1,4 @@
-const AV = require('../../../libs/av-weapp-min.js');
-var mta = require('../../../libs/mta_analysis.js')
+const AV = require('../../../libs/av-core-min.js');
 
 Page({
   data: {
@@ -10,7 +9,6 @@ Page({
   },
 
   onLoad: function () {
-    mta.Page.init()
     wx.showShareMenu()
   },
 

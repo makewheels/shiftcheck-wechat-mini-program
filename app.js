@@ -1,15 +1,20 @@
-const AV = require('./libs/av-weapp-min.js')
-var mta = require('./libs/mta_analysis.js')
+const AV = require('./libs/av-core-min.js');
+const adapters = require('./libs/leancloud-adapters-weapp.js');
 
+// const AV = require('./libs/av-weapp-min.js')
+// var mta = require('./libs/mta_analysis.js')
+
+AV.setAdapters(adapters);
 AV.init({
   appId: 'WgCaIMjje5tVez7TD63Wfain-gzGzoHsz',
   appKey: 'RghzMpMGmyv5zyDVoecjyS4T',
+  serverURLs: 'https://mp.shiftcheck.java8.icu'
 });
 
 App({
   globalData: {
     //小程序版本号
-    appVersion: "2.3.2",
+    appVersion: "2.3.3",
     userInfo: null,
     launchScene: {}
   },
@@ -39,22 +44,13 @@ App({
   },
 
   onLaunch: function (launchScene) {
-    //调用API从本地缓存中获取数据
-    var logs = wx.getStorageSync('logs') || []
-    logs.unshift(Date.now())
-    wx.setStorageSync('logs', logs)
+    let that=this
     this.globalData.launchScene = launchScene
-    //mta初始化
-    mta.App.init({
-      "appID": "500623733",
-      "eventID": "500623763",
-      "statPullDownFresh": true,
-      "statShareApp": true,
-      "statReachBottom": true,
-      "lauchOpts": launchScene
-    });
+
     //leancloud登录
-    AV.User.loginWithWeapp();
+    AV.User.loginWithMiniApp().then(user => {
+      that.globalData.user = user
+    })
     this.getUserInfo()
   }
 })

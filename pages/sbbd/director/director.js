@@ -1,5 +1,3 @@
-var mta = require('../../../libs/mta_analysis.js')
-
 Page({
   /**
    * 页面的初始数据
@@ -22,7 +20,6 @@ Page({
   },
 
   onLoad: function() {
-    mta.Page.init()
     wx.showShareMenu()
     var date = new Date()
     this.setData({
