@@ -14,10 +14,8 @@ Page({
 
   onLoad: function() {
     wx.showShareMenu()
-  },
 
-  //我的获取本次使用信息
-  onShow: function() {
+    var that = this
     //如果刚刚已经开过了
     if (this.data.lastTimestamp != 0) {
       var diffTimestamp = new Date().getTime() - this.data.lastTimestamp
@@ -29,18 +27,23 @@ Page({
     this.setData({
       lastTimestamp: new Date().getTime()
     })
-    var that = this
-      
     //网络信息
     wx.getNetworkType({
       success: function(wxnet) {
         //进行下一步
         var time = new Date().getTime() + ""
-        that.mystep2(time, wxnet)
+        
+        setTimeout(function () { that.mystep2(time, wxnet) }, 800);
+
+        // that.mystep2(time, wxnet)
       }
     })
+  },
+
+  //我的获取本次使用信息
+  onShow: function() {
     //检查更新
-    that.checkAppUpdate()
+    this.checkAppUpdate()
   },
 
   //mystep2
