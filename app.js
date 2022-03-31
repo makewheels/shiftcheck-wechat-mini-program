@@ -8,13 +8,13 @@ AV.setAdapters(adapters);
 AV.init({
   appId: 'WgCaIMjje5tVez7TD63Wfain-gzGzoHsz',
   appKey: 'RghzMpMGmyv5zyDVoecjyS4T',
-  serverURLs: 'https://mp.shiftcheck.java8.icu'
+  serverURLs: 'https://api.leancloud.mp.shiftcheck.work'
 });
 
 App({
   globalData: {
     //小程序版本号
-    appVersion: "2.3.3",
+    appVersion: "2.3.4",
     userInfo: null,
     launchScene: {}
   },
