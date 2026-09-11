@@ -109,11 +109,6 @@ Page({
             showCancel: false
           })
           wx.hideToast()
-          //存储设置，默认打开自定义页
-          wx.setStorage({
-            key: 'homepage',
-            data: 'diy'
-          })
           wx.navigateBack({});
         });
       }
