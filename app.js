@@ -1,8 +1,6 @@
 const AV = require('./libs/av-core-min.js');
 const adapters = require('./libs/leancloud-adapters-weapp.js');
 
-// const AV = require('./libs/av-weapp-min.js')
-
 AV.setAdapters(adapters);
 AV.init({
   appId: 'WgCaIMjje5tVez7TD63Wfain-gzGzoHsz',

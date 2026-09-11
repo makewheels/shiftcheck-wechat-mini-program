@@ -74,7 +74,7 @@ function appStub(overrides) {
 
 function makeRequire(fromFile) {
   return function (id) {
-    if (/av-core-min|av-weapp-min|leancloud-adapters|mta_analysis/.test(id)) return AV_STUB
+    if (/av-core-min|leancloud-adapters/.test(id)) return AV_STUB
     if (id.charAt(0) === '.') return require(path.resolve(path.dirname(fromFile), id))
     return require(id)
   }
