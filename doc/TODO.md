@@ -42,3 +42,29 @@
 
 - [ ] **端到端验证待补**：升级流程要真跑一遍，得先把新版本上传到微信后台。本机微信开发者工具的 CLI 服务端口是关闭状态（设置 → 安全设置 → 服务端口），命令行编译/上传都用不了，所以这次只做了代码级验证，没有在模拟器/真机上跑通「上传 → 检测到新版本 → 弹窗 → 重启」全链路
 
+## 4. 发布前必须在微信后台做的事
+
+代码改不动的部分都整理在 `doc/发布前检查单.md`：
+
+- [ ] request 合法域名白名单（现在全仓库只剩 `api.leancloud.mp.shiftcheck.work` 一个域名）
+- [ ] 用户隐私保护指引（剪贴板 / 邮箱 / 手机号 / 设备信息 / openid）
+- [ ] 两个已泄露的 ip138 token 作废
+- [ ] 三个广告位（2 个 banner + 1 个激励视频）是否属于本小程序主体
+- [ ] 基础库版本统一（`project.config.json` 2.8.2 vs `project.private.config.json` 2.25.3）
+- [ ] 上传体验版 → 按检查单真机走一遍 → 提审
+
+## 5. 其它已知遗留（不阻塞发布）
+
+- [ ] `pages/setting/feedback/`：`feedback.wxml` 只有一行占位文字「反馈：内容，联系方式」，
+  `home.wxml` 里的「反 馈」按钮也是注释掉的，等于没实现。要么补实现，要么连页面一起删掉
+- [ ] `pages/logs/`：还是模板默认内容，而且全仓库没有入口能进去
+  （`index.js` 的 `bindViewTap` 没有绑到任何元素）。建议删掉
+- [ ] `updateMail.js` / `updatePhone.js` 里保存时的 `users[0].id` 没判空。
+  当前流程走不到（`accountHome.onShow` 会先把 `WechatUser` 记录建好），但记录创建失败时会崩
+- [ ] 各页都调了 `wx.showShareMenu()`，但没有页面实现 `onShareAppMessage`，
+  转发卡片用的是默认标题和页面截图。想做自定义分享文案要逐页补
+- [ ] `index.js` 里跳过自身上报的 openid 是硬编码的（作者自己的 openid），本次保留未动；
+  介意它出现在公开仓库里的话，可以改成从 LeanCloud 配置读
+- [ ] 以后若真的需要用户头像昵称，用官方的「头像昵称填写能力」重做
+  （`open-type="chooseAvatar"` + `input type="nickname"`），不要再回到 `wx.getUserInfo`
+
