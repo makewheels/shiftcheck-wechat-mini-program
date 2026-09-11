@@ -13,20 +13,18 @@ on:
 
 jobs:
   test:
-    name: test (node ${{ matrix.node }})
+    name: test
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        # 跑两个版本：node:test 的行为在版本间有差异（同步父测试里的 t.test() 子测试
-        # 在 22 上会被取消、在 24 上不会），只测一个版本容易漏掉这类问题
-        node: ['22', '24']
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          # 与本地开发用的版本保持一致（本机 v24.x）。
+          # 曾经跑 22+24 双矩阵，但真正的教训是「本地与 CI 必须同版本」，
+          # 而不是「要多测几个版本」：本地 24、CI 22 才会出现本地绿、CI 红的纯版本噪音。
+          # 测试用的是 Node 内置能力（node:test / node:assert），不依赖新版本特性。
+          node-version: '24'
 
       - name: 单元与门禁测试（node:test，零依赖）
         run: node --test test/*.test.js
