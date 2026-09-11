@@ -1,3 +1,5 @@
+var shift = require('../../../utils/shift.js')
+
 Page({
   data: {
     //模式名
@@ -129,7 +131,7 @@ Page({
   getOnDuty: function() {
     var names = ["一班", "二班", "三班", "四班"]
     var total = this.getTotalDays()
-    return names[total % 4]
+    return names[shift.mod(total, 4)]
   },
 
   /**
@@ -139,7 +141,7 @@ Page({
     // 排班基准日：2026-09-10 为「一班上班」日（2026-09-11 已与真实班次核对）
     var date1 = new Date(2026, 8, 10);
     var date2 = new Date(this.data.year, this.data.month, this.data.day)
-    var days = parseInt(Math.abs(date2 - date1) / 1000 / 60 / 60 / 24)
+    var days = shift.daysBetween(date1, date2)
     return days
   },
 

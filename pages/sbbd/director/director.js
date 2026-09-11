@@ -1,3 +1,5 @@
+var shift = require('../../../utils/shift.js')
+
 Page({
   /**
    * 页面的初始数据
@@ -145,7 +147,7 @@ Page({
   getTotalDays: function() {
     var date1 = new Date(2017, 0, 1);
     var date2 = new Date(this.data.year, this.data.month, this.data.day)
-    var days = parseInt(Math.abs(date2 - date1) / 1000 / 60 / 60 / 24)
+    var days = shift.daysBetween(date1, date2)
     return days
   },
 
@@ -179,7 +181,7 @@ Page({
    */
   getBaiban: function() {
     var total = this.getTotalDays()
-    var remainder = total % 21
+    var remainder = shift.mod(total, 21)
     if (remainder == 6) {
       return "一班"
     } else if (remainder == 7) {
@@ -202,7 +204,7 @@ Page({
    */
   getYeban: function() {
     var total = this.getTotalDays()
-    var remainder = total % 3
+    var remainder = shift.mod(total, 3)
     if (remainder == 0) {
       return "三班"
     } else if (remainder == 1) {
