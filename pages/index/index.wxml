@@ -7,6 +7,11 @@
     <button bindtap="toWbsdWorker" hover-class="hover">个 人</button>
     <button bindtap="toWbsdDirector" hover-class="hover">总 览</button>
   </view>
+  <view class="flex-wrap">
+    <text>经警队：</text>
+    <button bindtap="toJjdWorker" hover-class="hover">个 人</button>
+    <button bindtap="toJjdDirector" hover-class="hover">总 览</button>
+  </view>
   <span>采 油 队：</span>
   <view class="flex-wrap">
     <text>四班四倒：</text>

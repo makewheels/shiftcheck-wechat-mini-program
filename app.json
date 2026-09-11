@@ -8,6 +8,8 @@
     "pages/sbsd/worker/worker",
     "pages/sbbd/director/director",
     "pages/sbbd/worker/worker",
+    "pages/jjd/worker/worker",
+    "pages/jjd/director/director",
     "pages/setting/home/home",
     "pages/setting/workerDefaultBanzu/workerDefaultBanzu",
     "pages/setting/myRuleHome/myRuleHome",

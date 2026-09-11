@@ -1,0 +1,28 @@
+.container {
+  padding: 50rpx 0;
+}
+
+.subtitle {
+  color: blue;
+  font-size: 50rpx;
+  margin-bottom: 30rpx;
+}
+
+#currentBanzu {
+  color: red;
+}
+
+.yellow {
+  background-color: yellow;
+}
+
+.flex-wrap {
+  display: -webkit-flex;
+}
+
+.btn_banzu {
+  margin-left: 5rpx;
+  margin-right: 5rpx;
+  padding-left: 20rpx;
+  padding-right: 20rpx;
+}
