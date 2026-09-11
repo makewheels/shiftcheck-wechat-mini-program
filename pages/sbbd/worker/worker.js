@@ -1,3 +1,5 @@
+var shift = require('../../../utils/shift.js')
+
 Page({
   /**
    * 页面的初始数据
@@ -150,7 +152,7 @@ Page({
     var total = this.getTotalDays();
     // 根据求余结果翻译出什么值，并返回String
     // 翻译规则：0：休息，1：白班，2：夜班
-    var remainder = loopBody[total % 21];
+    var remainder = loopBody[shift.mod(total, 21)];
     if (remainder == 0) {
       return "休息";
     } else if (remainder == 1) {
@@ -212,7 +214,7 @@ Page({
   getTotalDays: function () {
     var date1 = new Date(2017, 0, 2);
     var date2 = new Date(this.data.year, this.data.month, this.data.day)
-    var days = parseInt(Math.abs(date2 - date1) / 1000 / 60 / 60 / 24)
+    var days = shift.daysBetween(date1, date2)
     return days
   },
 

@@ -1,3 +1,5 @@
+var shift = require('../../../utils/shift.js')
+
 Page({
   /**
    * 页面的初始数据
@@ -78,7 +80,7 @@ Page({
     var banzu = this.data.banzuId
     var total = this.getTotalDays()
     // 0：一班上班，1：二班上班，2：三班上班，3：四班上班
-    var onDuty = total % 4
+    var onDuty = shift.mod(total, 4)
     if (banzu == onDuty + 1) {
       return "上班"
     }
@@ -138,7 +140,7 @@ Page({
     // 排班基准日：2026-09-10 为「一班上班」日（2026-09-11 已与真实班次核对）
     var date1 = new Date(2026, 8, 10);
     var date2 = new Date(this.data.year, this.data.month, this.data.day)
-    var days = parseInt(Math.abs(date2 - date1) / 1000 / 60 / 60 / 24)
+    var days = shift.daysBetween(date1, date2)
     return days
   },
 
