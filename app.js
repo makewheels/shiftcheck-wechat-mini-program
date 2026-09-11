@@ -13,7 +13,7 @@ AV.init({
 App({
   globalData: {
     //小程序版本号
-    appVersion: "2.3.4",
+    appVersion: "2.4.0",
     launchScene: {}
   },
 
