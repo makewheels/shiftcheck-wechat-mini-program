@@ -64,7 +64,8 @@ const UPDATE_MANAGER = {
 // storage 传一个普通对象时，getStorageSync/setStorageSync 会读写它，
 // 用来测「跨页面实例共享 storage」的行为（例如首页的上报节流）
 // calls 传一个数组时，会记下页面访问过哪些 wx API，用来断言某条分支有没有走到
-function makeWxStub(storage, calls) {
+// apiLog 传一个数组时，会记下 no-op API 的调用名与参数（例如 reLaunch 的 url）
+function makeWxStub(storage, calls, apiLog) {
   return new Proxy({}, {
     get: function (_target, prop) {
       if (calls && typeof prop === 'string') calls.push(prop)
@@ -83,7 +84,9 @@ function makeWxStub(storage, calls) {
       if (prop === 'getSystemInfoSync') return function () { return {} }
       if (prop === 'getUpdateManager') return function () { return UPDATE_MANAGER }
       if (prop === 'canIUse') return function () { return true }
-      return function () {}
+      return function (arg) {
+        if (apiLog && typeof prop === 'string') apiLog.push({ name: prop, arg: arg })
+      }
     }
   })
 }
@@ -114,11 +117,15 @@ function loadConfig(file, opts) {
   let config = null
   const capture = function (cfg) { config = cfg }
   const code = fs.readFileSync(file, 'utf8')
+  // opts.pageStack 控制 getCurrentPages() 返回的页面栈，用来测深链场景（栈深只有 1）
+  const pageStack = (opts && opts.pageStack) || [{}, {}]
   new Function(
-    'Page', 'Component', 'App', 'require', 'wx', 'getApp', 'module', 'exports', '__dirname',
+    'Page', 'Component', 'App', 'require', 'wx', 'getApp', 'getCurrentPages',
+    'module', 'exports', '__dirname',
     code
-  )(capture, capture, capture, makeRequire(file), makeWxStub(opts && opts.storage, opts && opts.calls), appStub,
-    { exports: {} }, {}, path.dirname(file))
+  )(capture, capture, capture, makeRequire(file),
+    makeWxStub(opts && opts.storage, opts && opts.calls, opts && opts.apiLog), appStub,
+    function () { return pageStack }, { exports: {} }, {}, path.dirname(file))
   if (!config) throw new Error('没能从 ' + file + ' 取到配置对象')
   return config
 }

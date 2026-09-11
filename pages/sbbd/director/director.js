@@ -41,9 +41,15 @@ Page({
    * 返回主页
    */
   close: function() {
-    wx.navigateBack({
-
-    })
+    //深链进入（分享卡片 / 扫码 / 搜一搜）时页面栈只有 1 层，
+    //这时 navigateBack 会静默失败、「返回主页」点了没反应，所以改用 reLaunch 回首页
+    if (getCurrentPages().length <= 1) {
+      wx.reLaunch({
+        url: '/pages/index/index'
+      })
+      return
+    }
+    wx.navigateBack({})
   },
 
   /**
