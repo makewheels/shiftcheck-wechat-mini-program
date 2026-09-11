@@ -14,9 +14,19 @@ const path = require('path')
 const REPO = path.resolve(__dirname, '..', '..')
 
 // LeanCloud SDK 替身：测试不连后端
+// extend() 要返回一个"像样"的构造器：页面里会 new 出来再 .save()，
+// 而且这些调用常常发生在 setTimeout 里（测试结束之后），桩不完整就会抛出未捕获异常
 const AV_STUB = {
   Object: {
-    extend: function () { return function () {} },
+    extend: function () {
+      return function (attrs) {
+        Object.assign(this, attrs || {})
+        this.save = function () { return Promise.resolve(this) }
+        this.set = function () {}
+        this.get = function () { return undefined }
+        this.destroy = function () { return Promise.resolve(this) }
+      }
+    },
     createWithoutData: function () {
       return {
         set: function () {},
@@ -51,16 +61,35 @@ const UPDATE_MANAGER = {
 }
 
 // wx 替身：默认全是 no-op，几个需要返回值的单独给
-const WX_STUB = new Proxy({}, {
-  get: function (_target, prop) {
-    if (prop === 'getStorageSync') return function () { return undefined }
-    if (prop === 'getSystemInfo') return function (o) { if (o && o.success) o.success({}) }
-    if (prop === 'getSystemInfoSync') return function () { return {} }
-    if (prop === 'getUpdateManager') return function () { return UPDATE_MANAGER }
-    if (prop === 'canIUse') return function () { return true }
-    return function () {}
-  }
-})
+// storage 传一个普通对象时，getStorageSync/setStorageSync 会读写它，
+// 用来测「跨页面实例共享 storage」的行为（例如首页的上报节流）
+// calls 传一个数组时，会记下页面访问过哪些 wx API，用来断言某条分支有没有走到
+function makeWxStub(storage, calls) {
+  return new Proxy({}, {
+    get: function (_target, prop) {
+      if (calls && typeof prop === 'string') calls.push(prop)
+      if (prop === 'getStorageSync') {
+        return function (k) { return storage && storage[k] !== undefined ? storage[k] : '' }
+      }
+      if (prop === 'setStorageSync') {
+        return function (k, v) { if (storage) storage[k] = v }
+      }
+      if (prop === 'setStorage') {
+        return function (o) { if (storage && o && o.key !== undefined) storage[o.key] = o.data }
+      }
+      if (prop === 'getNetworkType') return function (o) { if (o && o.success) o.success({ networkType: 'wifi' }) }
+      if (prop === 'getScreenBrightness') return function (o) { if (o && o.success) o.success({ value: 0.5 }) }
+      if (prop === 'getSystemInfo') return function (o) { if (o && o.success) o.success({}) }
+      if (prop === 'getSystemInfoSync') return function () { return {} }
+      if (prop === 'getUpdateManager') return function () { return UPDATE_MANAGER }
+      if (prop === 'canIUse') return function () { return true }
+      return function () {}
+    }
+  })
+}
+
+// 不带 storage 的默认替身（绝大多数测试用这个）
+const WX_STUB = makeWxStub(null)
 
 // getApp() 替身：页面里会用到 globalData 与 openid 相关方法
 function appStub(overrides) {
@@ -81,14 +110,15 @@ function makeRequire(fromFile) {
 }
 
 /** 加载一个 js 文件，返回它传给 Page() / Component() / App() 的配置对象 */
-function loadConfig(file) {
+function loadConfig(file, opts) {
   let config = null
   const capture = function (cfg) { config = cfg }
   const code = fs.readFileSync(file, 'utf8')
   new Function(
     'Page', 'Component', 'App', 'require', 'wx', 'getApp', 'module', 'exports', '__dirname',
     code
-  )(capture, capture, capture, makeRequire(file), WX_STUB, appStub, { exports: {} }, {}, path.dirname(file))
+  )(capture, capture, capture, makeRequire(file), makeWxStub(opts && opts.storage, opts && opts.calls), appStub,
+    { exports: {} }, {}, path.dirname(file))
   if (!config) throw new Error('没能从 ' + file + ' 取到配置对象')
   return config
 }
@@ -121,9 +151,9 @@ function instantiate(config, extraData) {
   return inst
 }
 
-/** 按仓库相对路径加载页面 / 组件实例 */
-function load(relPath, extraData) {
-  return instantiate(loadConfig(path.join(REPO, relPath)), extraData)
+/** 按仓库相对路径加载页面 / 组件实例；opts.storage 传对象可模拟跨实例共享的本地存储 */
+function load(relPath, extraData, opts) {
+  return instantiate(loadConfig(path.join(REPO, relPath), opts), extraData)
 }
 
 /** 递归列出目录下所有文件，跳过 .git 与 node_modules */
@@ -147,6 +177,7 @@ module.exports = {
   REPO: REPO,
   AV_STUB: AV_STUB,
   WX_STUB: WX_STUB,
+  makeWxStub: makeWxStub,
   appStub: appStub,
   loadConfig: loadConfig,
   instantiate: instantiate,

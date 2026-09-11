@@ -4,25 +4,22 @@ var UseMessage = AV.Object.extend('UseMessage');
 var app = getApp()
 
 Page({
-  data: {
-    lastTimestamp: 0
-  },
+  data: {},
 
   onLoad: function() {
     wx.showShareMenu()
 
     var that = this
-    //如果刚刚已经开过了
-    if (this.data.lastTimestamp != 0) {
-      var diffTimestamp = new Date().getTime() - this.data.lastTimestamp
-      if (diffTimestamp < (5 * 60 * 1000)) {
-        return;
-      }
+    //5 分钟内不重复上报。
+    //原来这个时间戳存在页面 data 里，而 data 是每个页面实例各自一份、初值 0，
+    //onLoad 又只在实例创建时跑一次，所以那个 return 永远走不到 —— 等于每次冷启动都上报一条。
+    //改成存 storage，跨实例才真的能节流。
+    var now = new Date().getTime()
+    var lastReport = wx.getStorageSync('lastReportTimestamp') || 0
+    if (lastReport && now - lastReport < (5 * 60 * 1000)) {
+      return
     }
-    //新开的，或开了不久的
-    this.setData({
-      lastTimestamp: new Date().getTime()
-    })
+    wx.setStorageSync('lastReportTimestamp', now)
     //网络信息
     wx.getNetworkType({
       success: function(wxnet) {
