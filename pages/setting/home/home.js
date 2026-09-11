@@ -20,12 +20,5 @@ Page({
     wx.navigateTo({
       url: '../workerDefaultBanzu/workerDefaultBanzu',
     })
-  },
-
-  //我的DIY规则
-  toMyRule: function() {
-    wx.navigateTo({
-      url: '../myRuleHome/myRuleHome'
-    })
   }
 })

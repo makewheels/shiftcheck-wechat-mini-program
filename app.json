@@ -10,11 +10,7 @@
     "pages/jjd/worker/worker",
     "pages/jjd/director/director",
     "pages/setting/home/home",
-    "pages/setting/workerDefaultBanzu/workerDefaultBanzu",
-    "pages/setting/myRuleHome/myRuleHome",
-    "pages/setting/importRuleByKey/importRuleByKey",
-    "pages/diy/diy",
-    "pages/diyPush/diyPush"
+    "pages/setting/workerDefaultBanzu/workerDefaultBanzu"
   ],
   "window": {
     "backgroundTextStyle": "light",

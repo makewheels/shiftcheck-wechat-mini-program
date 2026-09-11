@@ -114,14 +114,13 @@ test('已废弃 API 不许再出现', function () {
     '这些只返回匿名数据；要头像昵称用 open-type="chooseAvatar" + input type="nickname"')
 })
 
-test('隐私接口只允许出现在已声明的位置', function () {
-  // 剪贴板：只有「一键粘贴」激活码那一处是用户主动触发的正当用法
-  const clip = codeHits(/wx\.getClipboardData/)
-  assert.ok(clip.length <= 1, '剪贴板读取应只剩一处：\n' + clip.join('\n'))
-  clip.forEach(function (h) {
-    assert.ok(h.startsWith('pages/setting/importRuleByKey/'),
-      '只有 importRuleByKey 允许读剪贴板（且后台隐私指引必须声明剪贴板）：' + h)
-  })
+test('隐私接口一处都不许有（后台无需再声明任何隐私信息）', function () {
+  // 曾经唯一合规的剪贴板用法在 importRuleByKey 的「一键粘贴」，该页随 DIY 链路一起删了。
+  // 现在全仓库不应该再有任何微信隐私接口 —— 这意味着《用户隐私保护指引》里没有必须声明的接口项
+  const clip = codeHits(/wx\.getClipboardData|wx\.setClipboardData/)
+  assert.deepStrictEqual(clip, [],
+    '不要引入剪贴板读写：它是微信隐私接口，必须在后台《用户隐私保护指引》声明，' +
+    '未声明时基础库 2.32.3+ 会直接 fail：\n' + clip.join('\n'))
   // 位置类隐私接口一个都不该有（后台没声明，加了会被拦）
   assert.deepStrictEqual(codeHits(/wx\.getLocation|wx\.chooseLocation|wx\.chooseAddress|wx\.getWeRunData/), [],
     '不要引入位置类隐私接口，后台《用户隐私保护指引》没有声明它们')

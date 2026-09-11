@@ -103,7 +103,7 @@ test('usingComponents 声明的组件文件齐全且标了 component:true', func
     })
   })
   assert.deepStrictEqual(problems, [], problems.join('; '))
-  assert.ok(checked >= 9, '至少 9 个倒班页应声明 shift-calendar 组件，实际只有 ' + checked + ' 处')
+  assert.ok(checked >= 8, '至少 8 个倒班页应声明 shift-calendar 组件，实际只有 ' + checked + ' 处')
 })
 
 test('wxml 里 bind/catch 绑定的处理函数在对应 js 中都存在', function () {
@@ -136,14 +136,20 @@ test('sitemap.json 规则合法：引用的页面都已注册，且最后一条�
   const last = sitemap.rules[sitemap.rules.length - 1]
   assert.strictEqual(last.action, 'disallow', '最后一条应是兜底 disallow，否则等于全开放')
   assert.strictEqual(last.page, '*', '兜底规则应作用于所有页面')
-  // 含个人信息输入的页面绝不能被索引
-  const SENSITIVE = ['accountHome', 'updateMail', 'updatePhone', 'pushHome', 'newPushMission', 'importRuleByKey', 'myRuleHome', 'diyPush']
+  // 只允许首页与 8 个倒班查询页被索引（它们纯本地计算、不依赖登录态，被搜到直接能用）
+  const ALLOWED = new Set([
+    'pages/index/index',
+    'pages/wbsd/worker/worker', 'pages/wbsd/director/director',
+    'pages/sbsd/worker/worker', 'pages/sbsd/director/director',
+    'pages/sbbd/worker/worker', 'pages/sbbd/director/director',
+    'pages/jjd/worker/worker', 'pages/jjd/director/director'
+  ])
   const allowed = sitemap.rules.filter(function (r) { return r.action === 'allow' }).map(function (r) { return r.page })
-  SENSITIVE.forEach(function (kw) {
-    allowed.forEach(function (p) {
-      assert.ok(p.indexOf(kw) === -1, '含个人信息/未验证的页面不该被索引：' + p)
-    })
+  allowed.forEach(function (p) {
+    assert.ok(ALLOWED.has(p), 'sitemap 只应开放首页与 8 个倒班查询页，多出了：' + p)
   })
+  assert.strictEqual(allowed.length, ALLOWED.size,
+    'sitemap 应恰好开放 ' + ALLOWED.size + ' 个页面，实际 ' + allowed.length + ' 个')
 })
 
 test('「返回主页」类处理函数必须处理页面栈只有 1 层的深链场景', function () {
