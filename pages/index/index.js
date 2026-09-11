@@ -166,6 +166,18 @@ Page({
     })
   },
 
+  toJjdWorker: function() {
+    wx.navigateTo({
+      url: '../jjd/worker/worker'
+    })
+  },
+
+  toJjdDirector: function() {
+    wx.navigateTo({
+      url: '../jjd/director/director'
+    })
+  },
+
   //跳转到我的DIY规则页面
   toMyDiy: function() {
     var that = this
