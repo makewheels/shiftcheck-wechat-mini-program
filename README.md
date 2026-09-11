@@ -1,3 +1,5 @@
+> 给 AI agent / 新协作者的仓库须知与陷阱清单见 [`AGENTS.md`](AGENTS.md)；变更流程与测试规范见 [`doc/README.md`](doc/README.md)。
+
 ## 版本更新日志
 
 ## 2.3.0
