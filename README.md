@@ -16,3 +16,9 @@ mta统计，首页的按钮，倒班规则选择。是哪个班组，个人还�
 
 ## 2.3.3
 删除mta，修复leancloud，修复登录onShow函数显示过快报toJSON错误问题
+
+## 变更规范
+
+- 所有改动必须走分支 + Pull Request（默认分支 `master` 已开启保护，禁止直接 push）。
+- 每次变更在 `doc/changes/` 下留一份 markdown 记录；详细规范见 `doc/README.md`。
+- 待办清单见 `doc/TODO.md`。
