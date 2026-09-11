@@ -1,0 +1,56 @@
+name: CI
+
+# 门禁：PR 与 master 推送都要跑
+# 注意这里跑不了小程序模拟器（微信开发者工具没有 Linux 版，且需要扫码登录），
+# 所以 CI 覆盖的是纯逻辑层：排班算法、日历渲染数据、结构完整性、代码卫生。
+# 界面层（渲染、换行、点击手感）仍需人工在开发者工具或真机上过一遍。
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: test (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 跑两个版本：node:test 的行为在版本间有差异（同步父测试里的 t.test() 子测试
+        # 在 22 上会被取消、在 24 上不会），只测一个版本容易漏掉这类问题
+        node: ['22', '24']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: 单元与门禁测试（node:test，零依赖）
+        run: node --test test/*.test.js
+
+      - name: 全部业务 js 语法检查
+        run: |
+          fail=0
+          for f in $(find app.js pages utils components -name '*.js'); do
+            node --check "$f" || { echo "语法错误: $f"; fail=1; }
+          done
+          exit $fail
+
+      - name: 全部 json 可解析
+        run: |
+          fail=0
+          for f in $(find . -name '*.json' -not -path './.git/*'); do
+            node -e "JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'))" "$f" \
+              || { echo "JSON 错误: $f"; fail=1; }
+          done
+          exit $fail
+
+      - name: 小程序包体积参考（不含 libs 的第三方 SDK）
+        run: |
+          echo "业务代码体积："
+          du -sh --exclude=libs --exclude=.git --exclude=test . || true
+          echo "各目录："
+          du -sh pages utils components libs 2>/dev/null || true
