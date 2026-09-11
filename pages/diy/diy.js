@@ -1,4 +1,5 @@
 var shift = require('../../utils/shift.js')
+var calendar = require('../../utils/calendar.js')
 
 const AV = require('../../libs/av-core-min.js');
 
@@ -10,6 +11,10 @@ Page({
     year: 0,
     month: 0,
     day: 0,
+    //视图：list 一周列表 / calendar 月日历
+    viewMode: "list",
+    //月日历的渲染数据
+    cal: null,
     r0: "loading...",
     //七行数据
     r1: "loading...",
@@ -190,13 +195,20 @@ Page({
       r7: this.getRow()
     })
     this.changeDate(-6)
+    calendar.refresh(this)
   },
 
   /**
    * 获得一行内容
    */
   getRow: function() {
-    var dateStr = this.getDateString()
+    return this.getDateString() + this.getDayText()
+  },
+
+  /**
+   * 一行里除日期之外的内容（月日历格子复用同一套班次算法）
+   */
+  getDayText: function() {
     var banzuList = this.data.json.banzuList
     var periodList = this.data.json.periodList
     var restName = this.data.json.restName
@@ -215,7 +227,7 @@ Page({
         rowStr = rowStr + "、"
       }
     }
-    return dateStr + rowStr
+    return rowStr
   },
 
   /**
@@ -259,5 +271,56 @@ Page({
       week = "周天"
     }
     return week + (date.getMonth() + 1) + "月" + date.getDate() + "日："
+  },
+
+  /**
+   * 月日历里一格的内容
+   */
+  getDayCell: function(year, month, day) {
+    var self = this
+    if (!this.data.json) {
+      return { text: '', work: null }
+    }
+    return calendar.onDate(this, year, month, day, function() {
+      var text = self.getDayText()
+      var restName = self.data.json.restName
+      var parts = text.split("、")
+      var allRest = parts.length > 0
+      for (var i = 0; i < parts.length; i++) {
+        if (parts[i] !== restName) {
+          allRest = false
+          break
+        }
+      }
+      return { text: text, work: !allRest }
+    })
+  },
+
+  /**
+   * 一周列表 / 月日历 切换
+   */
+  toggleView: function() {
+    calendar.toggleView(this)
+  },
+
+  /**
+   * 上一月按钮（月日历）
+   */
+  backMonth: function() {
+    calendar.changeMonth(this, -1)
+  },
+
+  /**
+   * 下一月按钮（月日历）
+   */
+  nextMonth: function() {
+    calendar.changeMonth(this, 1)
+  },
+
+  /**
+   * 点月日历里的某一天：回到列表，并从这天开始显示 7 天
+   */
+  onCalendarDayTap: function(e) {
+    calendar.dayTap(this, e.detail)
   }
 })

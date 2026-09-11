@@ -1,1 +1,5 @@
-{}
+{
+  "usingComponents": {
+    "shift-calendar": "/components/shift-calendar/shift-calendar"
+  }
+}
