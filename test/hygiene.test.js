@@ -31,10 +31,16 @@ function collect(filter) {
 const CODE = collect(function (f) { return /\.(js|json|wxml|wxss)$/.test(f) && !f.includes('/test/') })
 const ALL = collect(function (f) { return /\.(js|json|wxml|wxss|md)$/.test(f) })
 
-function hitsIn(files, re) {
+function hitsIn(files, re, includeMarkedLines) {
   const out = []
   files.forEach(function (f) {
     fs.readFileSync(f, 'utf8').split('\n').forEach(function (line, i) {
+      // 显式豁免：规则条文本身有时必须写出被禁的字样（例如 AGENTS.md 里
+      // 「不要写 Co-Authored-By 尾注」这条规则）。这种行加 <!-- hygiene-allow-line --> 标记，
+      // 豁免是可见、可 grep 的，而不是把正则偷偷放宽。
+      // 注意：检查「豁免标记本身有没有被滥用」时必须传 includeMarkedLines = true，
+      // 否则那个检查会把自己要找的行也跳过，成为永远命中不了的死测试（这个坑真踩过）
+      if (!includeMarkedLines && line.includes('hygiene-allow-line')) return
       if (re.test(line)) out.push(mp.rel(f) + ':' + (i + 1) + '  ' + line.trim().slice(0, 90))
     })
   })
@@ -158,6 +164,19 @@ test('公开仓库里不许出现雇主/开发环境信息与第三方工具署�
   ]
   banned.forEach(function (b) {
     assert.deepStrictEqual(allHits(b[1]), [], '公开仓库里出现「' + b[0] + '」')
+  })
+})
+
+test('hygiene-allow-line 豁免标记只许用在文档里，不许用来让代码蒙混过关', function () {
+  // 这两次扫描必须带 includeMarkedLines=true，否则带标记的行会被跳过，检查等于没做
+  const inCode = hitsIn(CODE, /hygiene-allow-line/, true)
+  assert.deepStrictEqual(inCode, [],
+    '代码文件里出现豁免标记 = 有人在掩盖真实违规；豁免只给「规则条文本身要写出被禁字样」的文档用')
+
+  const marked = hitsIn(ALL, /hygiene-allow-line/, true)
+  marked.forEach(function (h) {
+    assert.ok(h.startsWith('AGENTS.md') || h.startsWith('doc/') || h.startsWith('README.md'),
+      '豁免标记只允许出现在 AGENTS.md / README.md / doc/ 下：' + h)
   })
 })
 
