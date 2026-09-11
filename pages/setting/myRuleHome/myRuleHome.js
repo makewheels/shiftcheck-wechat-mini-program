@@ -1,4 +1,5 @@
 const AV = require('../../../libs/av-core-min.js');
+var app = getApp()
 
 Page({
   data: {
@@ -20,7 +21,12 @@ Page({
       duration: 20000
     });
     var that = this
-    var openid = AV.User.current().toJSON().authData.lc_weapp.openid
+    var openid = app.getOpenid()
+    //冷启动时 leancloud 登录可能还没回来，先等登录，别拿着 null 去查数据
+    if (!openid) {
+      app.withOpenid(() => this.onShow())
+      return
+    }
     var queryUserRule = new AV.Query('UserRule');
     queryUserRule.equalTo('openid', openid);
     queryUserRule.find().then(function(userRules) {
@@ -70,7 +76,7 @@ Page({
     });
     var that = this
     var query = new AV.Query('UserRule');
-    query.equalTo('openid', AV.User.current().toJSON().authData.lc_weapp.openid);
+    query.equalTo('openid', app.getOpenid());
     query.find().then(function(userRules) {
       //如果没存过规则
       if (userRules.length == 0) {

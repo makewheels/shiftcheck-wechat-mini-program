@@ -42,9 +42,9 @@ Page({
 
   //mystep2
   mystep2: function(time, wxnet) {
-    var user = AV.User.current().toJSON()
-    var openid = AV.User.current().toJSON().authData.lc_weapp.openid
-    if (openid == "o9K4b0QW0Yz2wosJeEIIk7QJo8Cg") {
+    var openid = app.getOpenid()
+    //还没登录上就不上报，原来这里直接 AV.User.current().toJSON() 会崩
+    if (!openid || openid == "o9K4b0QW0Yz2wosJeEIIk7QJo8Cg") {
       return
     }
     //屏幕亮度
@@ -65,8 +65,8 @@ Page({
                   time: time,
                   //场景值
                   scene: app.globalData.launchScene.scene,
-                  //用户信息
-                  openid: user.authData.lc_weapp.openid,
+                  //用户标识
+                  openid: openid,
                   //网络信息
                   networkType: wxnet.networkType,
                   ipjson: ip.data,
@@ -159,27 +159,28 @@ Page({
 
   //跳转到我的DIY规则页面
   toMyDiy: function() {
-    var that = this
     wx.showToast({
       title: '请稍候',
       icon: 'loading',
       duration: 20000
     });
-    var query = new AV.Query('UserRule');
-    query.equalTo('openid', AV.User.current().toJSON().authData.lc_weapp.openid);
-    query.find().then(function(userRules) {
-      if (userRules.length == 0) {
-        wx.showModal({
-          title: '提示',
-          content: '尚未导入规则！',
-          showCancel: false
-        })
-        wx.hideToast()
-      } else {
-        wx.navigateTo({
-          url: '../diy/diy'
-        })
-      }
+    app.withOpenid(function(openid) {
+      var query = new AV.Query('UserRule');
+      query.equalTo('openid', openid);
+      query.find().then(function(userRules) {
+        if (userRules.length == 0) {
+          wx.showModal({
+            title: '提示',
+            content: '尚未导入规则！',
+            showCancel: false
+          })
+          wx.hideToast()
+        } else {
+          wx.navigateTo({
+            url: '../diy/diy'
+          })
+        }
+      })
     })
   }
 })

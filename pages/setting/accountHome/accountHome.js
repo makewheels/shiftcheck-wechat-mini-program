@@ -1,4 +1,5 @@
 const AV = require('../../../libs/av-core-min.js');
+var app = getApp()
 
 Page({
   data: {
@@ -19,7 +20,12 @@ Page({
       duration: 20000
     });
     var that = this
-    var openid = AV.User.current().toJSON().authData.lc_weapp.openid
+    var openid = app.getOpenid()
+    //冷启动时 leancloud 登录可能还没回来，先等登录，别拿着 null 去查数据
+    if (!openid) {
+      app.withOpenid(() => this.onShow())
+      return
+    }
     var query = new AV.Query('WechatUser');
     query.equalTo('openid', openid);
     query.find().then(function (users) {
@@ -102,12 +108,12 @@ Page({
     //如果已经设置过邮箱，可以设置手机
     //如果没设过邮箱，必须先设置邮箱
     var that = this
-    var openid = AV.User.current().toJSON().authData.lc_weapp.openid
+    var openid = app.getOpenid()
     var query = new AV.Query('WechatUser');
     query.equalTo('openid', openid);
     query.find().then(function (users) {
-      var user = users[0]
-      var mail = user.get("mail")
+      //记录还没建好时按「没设过邮箱」处理，别直接取 users[0] 崩掉
+      var mail = users.length == 0 ? "" : users[0].get("mail")
       if (mail == undefined || mail == "") {
         wx.showModal({
           title: '提示',

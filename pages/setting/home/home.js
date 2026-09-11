@@ -37,25 +37,27 @@ Page({
       icon: 'loading',
       duration: 20000
     });
-    var query = new AV.Query('WechatUser');
-    query.equalTo('openid', AV.User.current().toJSON().authData.lc_weapp.openid);
-    query.find().then(function(users) {
-      if (users.length == 0 || users[0].get('mail') == undefined || users[0].get('mail') == "") {
-        wx.hideToast()
-        wx.navigateTo({
-          url: '../accountHome/accountHome',
-        })
-        wx.showModal({
-          title: '提示',
-          content: '请先设置邮箱和手机！',
-          showCancel: false
-        })
-      } else {
-        wx.navigateTo({
-          url: '../pushHome/pushHome'
-        })
-      }
-    });
+    app.withOpenid(function(openid) {
+      var query = new AV.Query('WechatUser');
+      query.equalTo('openid', openid);
+      query.find().then(function(users) {
+        if (users.length == 0 || users[0].get('mail') == undefined || users[0].get('mail') == "") {
+          wx.hideToast()
+          wx.navigateTo({
+            url: '../accountHome/accountHome',
+          })
+          wx.showModal({
+            title: '提示',
+            content: '请先设置邮箱和手机！',
+            showCancel: false
+          })
+        } else {
+          wx.navigateTo({
+            url: '../pushHome/pushHome'
+          })
+        }
+      });
+    })
   },
 
   //用户反馈

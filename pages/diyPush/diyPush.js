@@ -1,4 +1,5 @@
 const AV = require('../../libs/av-core-min.js');
+var app = getApp()
 
 let rewardedVideoAd = null
 
@@ -59,7 +60,7 @@ Page({
    */
   updateRestPushTimes: function() {
     var that = this
-    var openid = AV.User.current().toJSON().authData.lc_weapp.openid
+    var openid = app.getOpenid()
     var query = new AV.Query('WechatUser');
     query.equalTo('openid', openid);
     query.find().then(function(users) {
@@ -76,18 +77,27 @@ Page({
   addPushTime: function() {
     var that = this
     //更新后台数据
-    var openid = AV.User.current().toJSON().authData.lc_weapp.openid
+    var openid = app.getOpenid()
     var query = new AV.Query('WechatUser');
     query.equalTo('openid', openid);
     query.find().then(function(users) {
+      //还没有用户记录（没进过「设置 - 我的账户」），这时候加不了次数
+      if (users.length == 0) {
+        wx.showModal({
+          title: '提示',
+          content: '请先到「设置 - 我的账户」设置邮箱和手机，再来领推送次数',
+          showCancel: false
+        })
+        return
+      }
       var id = users[0].id
       var user = AV.Object.createWithoutData('WechatUser', id);
       user.set('mailPushTimes', that.data.mailPushTimes + 1)
       user.save()
-    })
-    //更新前台显示
-    that.setData({
-      mailPushTimes: that.data.mailPushTimes + 1
+      //更新前台显示
+      that.setData({
+        mailPushTimes: that.data.mailPushTimes + 1
+      })
     })
   },
 
