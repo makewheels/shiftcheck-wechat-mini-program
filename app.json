@@ -1,7 +1,6 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/logs/logs",
     "pages/wbsd/worker/worker",
     "pages/wbsd/director/director",
     "pages/sbsd/director/director",
@@ -15,7 +14,6 @@
     "pages/setting/myRuleHome/myRuleHome",
     "pages/setting/importRuleByKey/importRuleByKey",
     "pages/setting/pushHome/pushHome",
-    "pages/setting/feedback/feedback",
     "pages/setting/accountHome/accountHome",
     "pages/setting/updateMail/updateMail",
     "pages/setting/updatePhone/updatePhone",

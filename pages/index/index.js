@@ -82,13 +82,6 @@ Page({
     })
   },
 
-  //事件处理函数
-  bindViewTap: function() {
-    wx.navigateTo({
-      url: '../logs/logs'
-    })
-  },
-
   toWbsdWorker: function() {
     wx.navigateTo({
       url: '../wbsd/worker/worker'

@@ -60,13 +60,6 @@ Page({
     })
   },
 
-  //用户反馈
-  toFeedback: function() {
-    wx.navigateTo({
-      url: '../feedback/feedback',
-    })
-  },
-
   //我的账户
   toAccountHome: function() {
     wx.navigateTo({

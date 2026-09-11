@@ -59,10 +59,9 @@
 
 ## 5. 其它已知遗留（不阻塞发布）
 
-- [ ] `pages/setting/feedback/`：`feedback.wxml` 只有一行占位文字「反馈：内容，联系方式」，
-  `home.wxml` 里的「反 馈」按钮也是注释掉的，等于没实现。要么补实现，要么连页面一起删掉
-- [ ] `pages/logs/`：还是模板默认内容，而且全仓库没有入口能进去
-  （`index.js` 的 `bindViewTap` 没有绑到任何元素）。建议删掉
+- [x] ~~`pages/setting/feedback/`（空占位页，入口按钮是注释掉的）~~ 与
+  ~~`pages/logs/`（模板默认内容，全仓库无入口）~~ —— 两个死页面已删除，
+  见 `doc/changes/2026-09-11-231933-remove-dead-pages.md`
 - [ ] `updateMail.js` / `updatePhone.js` 里保存时的 `users[0].id` 没判空。
   当前流程走不到（`accountHome.onShow` 会先把 `WechatUser` 记录建好），但记录创建失败时会崩
 - [ ] 各页都调了 `wx.showShareMenu()`，但没有页面实现 `onShareAppMessage`，
