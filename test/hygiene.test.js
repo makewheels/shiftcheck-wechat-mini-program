@@ -195,23 +195,28 @@ test('app.js 的版本号与 README 更新日志里最新的版本一致', funct
   assert.strictEqual(m[1], latest, 'app.js 的 appVersion 与 README 最新版本号不一致（发版要两边一起改）')
 })
 
-test('变更记录文件名符合规范：YYYY-MM-DD-HHMMSS-简短说明.md', function () {
+test('变更记录文件名一律是 YYYY-MM-DD-HHMMSS-简短说明.md', function () {
   const dir = path.join(mp.REPO, 'doc/changes')
   const files = fs.readdirSync(dir).filter(function (f) { return f.endsWith('.md') })
   assert.ok(files.length > 0, 'doc/changes/ 不该是空的')
-  const NEW_FORMAT = /^\d{4}-\d{2}-\d{2}-\d{6}-[A-Za-z0-9.\u4e00-\u9fa5-]+\.md$/
-  const OLD_FORMAT = /^\d{4}-\d{2}-\d{2}-[A-Za-z0-9.\u4e00-\u9fa5-]+\.md$/
-  // 规范在 2026-09-11 21:38:22 调整，之前的记录是「只有日期」的旧格式，保留原名不追溯改
-  const CUTOVER = '20260911213822'
-  let newCount = 0
+
+  // 一天里会有多次提交，只写日期分不清先后，所以时分秒是必须的（不再有旧格式豁免）
+  const FORMAT = /^\d{4}-\d{2}-\d{2}-\d{6}-[A-Za-z0-9.\u4e00-\u9fa5-]+\.md$/
+  const bad = files.filter(function (f) { return !FORMAT.test(f) })
+  assert.deepStrictEqual(bad, [], '变更记录文件名不合规范（必须带时分秒）：' + bad.join(', '))
+
   files.forEach(function (f) {
-    const isNew = NEW_FORMAT.test(f)
-    assert.ok(isNew || (OLD_FORMAT.test(f) && !isNew), '变更记录文件名不合规范：' + f)
-    if (isNew) {
-      newCount++
-      const stamp = f.slice(0, 19).replace(/[^0-9]/g, '')
-      assert.ok(stamp >= CUTOVER, '带时分秒的记录应不早于规范调整时间：' + f)
-    }
+    const d = f.slice(0, 10).split('-').map(Number)
+    const t = f.slice(11, 17)
+    const hh = +t.slice(0, 2)
+    const mi = +t.slice(2, 4)
+    const ss = +t.slice(4, 6)
+    assert.ok(d[0] >= 2020 && d[1] >= 1 && d[1] <= 12 && d[2] >= 1 && d[2] <= 31, '日期部分不合法：' + f)
+    assert.ok(hh <= 23 && mi <= 59 && ss <= 59, '时间部分不合法：' + f)
   })
-  assert.ok(newCount > 0, '至少应有一份按新规范（带时分秒）命名的变更记录')
+
+  // 时间戳必须两两不同，否则又分不清先后了
+  const stamps = files.map(function (f) { return f.slice(0, 19) })
+  const dup = stamps.filter(function (s, i) { return stamps.indexOf(s) !== i })
+  assert.deepStrictEqual(dup, [], '有变更记录的时间戳重复：' + dup.join(', '))
 })
