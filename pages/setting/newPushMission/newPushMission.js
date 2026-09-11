@@ -1,4 +1,5 @@
 const AV = require('../../../libs/av-core-min.js');
+var app = getApp()
 
 Page({
   data: {
@@ -23,7 +24,7 @@ Page({
       duration: 20000
     });
     var that = this
-    var openid = AV.User.current().toJSON().authData.lc_weapp.openid
+    var openid = app.getOpenid()
     var query = new AV.Query('Rule');
     query.equalTo('isPublic', true);
     query.find().then(function (rules) {
@@ -70,7 +71,7 @@ Page({
       duration: 20000
     });
     var that = this
-    var openid = AV.User.current().toJSON().authData.lc_weapp.openid
+    var openid = app.getOpenid()
     var query = new AV.Query('UserRule')
     query.equalTo('openid', openid)
     query.find().then(function (userRules) {
@@ -305,7 +306,7 @@ Page({
     }
     var config = { "ruleId": ruleId, "banzu": banzuId, "ban": banConfigList }
     //向服务器保存数据
-    var openid = AV.User.current().toJSON().authData.lc_weapp.openid
+    var openid = app.getOpenid()
     var PushMission = AV.Object.extend('PushMission');
     var pushMission = new PushMission();
     pushMission.set('openid', openid);

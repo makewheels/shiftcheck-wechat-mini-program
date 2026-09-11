@@ -1,4 +1,5 @@
 const AV = require('../../../libs/av-core-min.js');
+var app = getApp()
 
 Page({
   data: {
@@ -79,7 +80,7 @@ Page({
         //一次性使用，设置为，用过了
         //保存openid，记录是谁激活的
         //记录时间
-        var openid = AV.User.current().toJSON().authData.lc_weapp.openid
+        var openid = app.getOpenid()
         var obj = AV.Object.createWithoutData('RuleKey', ruleKey.id);
         obj.set('state', 1);
         obj.set('openid', openid)

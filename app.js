@@ -19,6 +19,53 @@ App({
   },
 
   /**
+   * 当前登录用户的 openid，还没登录上时返回 null
+   * 页面里不要再直接写 AV.User.current().toJSON()，冷启动首次登录还没回来时那样会崩
+   */
+  getOpenid: function() {
+    var user = AV.User.current()
+    if (!user) {
+      return null
+    }
+    var json = user.toJSON()
+    var authData = json && json.authData && json.authData.lc_weapp
+    return authData ? authData.openid : null
+  },
+
+  /**
+   * 确保已经登录，拿到 openid 之后执行 cb(openid)
+   * 登录不上就提示用户，不执行 cb，避免页面拿着 null 去查数据
+   */
+  withOpenid: function(cb) {
+    var that = this
+    var openid = this.getOpenid()
+    if (openid) {
+      cb(openid)
+      return
+    }
+    AV.User.loginWithMiniApp().then(function(user) {
+      that.globalData.user = user
+      var openidAfterLogin = that.getOpenid()
+      if (openidAfterLogin) {
+        cb(openidAfterLogin)
+      } else {
+        that.loginFailTip()
+      }
+    }, function() {
+      that.loginFailTip()
+    })
+  },
+
+  loginFailTip: function() {
+    wx.hideToast()
+    wx.showModal({
+      title: '提示',
+      content: '登录没成功，请检查网络后重新打开小程序',
+      showCancel: false
+    })
+  },
+
+  /**
    * 小程序强制升级
    *
    * 三个回调都要在 onLaunch 里尽早注册：
@@ -60,16 +107,29 @@ App({
     })
   },
 
+  /**
+   * leancloud 登录，失败后重试
+   */
+  login: function(retryLeft) {
+    var that = this
+    var left = retryLeft === undefined ? 2 : retryLeft
+    AV.User.loginWithMiniApp().then(function(user) {
+      that.globalData.user = user
+    }, function() {
+      if (left > 0) {
+        setTimeout(function() {
+          that.login(left - 1)
+        }, 2000)
+      }
+    })
+  },
+
   onLaunch: function (launchScene) {
-    let that=this
     this.globalData.launchScene = launchScene
 
     //升级检查要尽早注册，放在登录之前
     this.initUpdateManager()
-
     //leancloud登录
-    AV.User.loginWithMiniApp().then(user => {
-      that.globalData.user = user
-    })
+    this.login()
   }
 })

@@ -2,6 +2,7 @@ var shift = require('../../utils/shift.js')
 var calendar = require('../../utils/calendar.js')
 
 const AV = require('../../libs/av-core-min.js');
+var app = getApp()
 
 Page({
   data: {
@@ -38,7 +39,12 @@ Page({
       duration: 20000
     });
     var that = this
-    var openid = AV.User.current().toJSON().authData.lc_weapp.openid
+    var openid = app.getOpenid()
+    //冷启动时 leancloud 登录可能还没回来，先等登录，别拿着 null 去查数据
+    if (!openid) {
+      app.withOpenid(() => this.onShow())
+      return
+    }
     var queryUserRule = new AV.Query('UserRule');
     queryUserRule.equalTo('openid', openid);
     queryUserRule.find().then(function(userRules) {
