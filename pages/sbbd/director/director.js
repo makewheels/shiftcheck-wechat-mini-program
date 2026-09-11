@@ -1,4 +1,5 @@
 var shift = require('../../../utils/shift.js')
+var calendar = require('../../../utils/calendar.js')
 
 Page({
   /**
@@ -11,6 +12,10 @@ Page({
     year: 0,
     month: 0,
     day: 0,
+    //视图：list 一周列表 / calendar 月日历
+    viewMode: "list",
+    //月日历的渲染数据
+    cal: null,
     //七行数据
     r1: "loading...",
     r2: "loading...",
@@ -132,13 +137,21 @@ Page({
       r7: this.getRow()
     })
     this.changeDate(-6)
+    calendar.refresh(this)
   },
 
   /**
    * 获得一行内容
    */
   getRow: function() {
-    return this.getDateString() + this.getBaiban() + "、" + this.getYeban()
+    return this.getDateString() + this.getDayText()
+  },
+
+  /**
+   * 一行里除日期之外的内容（月日历格子复用同一套班次算法）
+   */
+  getDayText: function() {
+    return this.getBaiban() + "、" + this.getYeban()
   },
 
   /**
@@ -212,6 +225,43 @@ Page({
     } else {
       return "二班"
     }
-  }
+  },
 
+  /**
+   * 月日历里一格的内容（总览页每天都有班，不区分上班/休息）
+   */
+  getDayCell: function(year, month, day) {
+    var self = this
+    return calendar.onDate(this, year, month, day, function() {
+      return { text: self.getDayText(), work: null }
+    })
+  },
+
+  /**
+   * 一周列表 / 月日历 切换
+   */
+  toggleView: function() {
+    calendar.toggleView(this)
+  },
+
+  /**
+   * 上一月按钮（月日历）
+   */
+  backMonth: function() {
+    calendar.changeMonth(this, -1)
+  },
+
+  /**
+   * 下一月按钮（月日历）
+   */
+  nextMonth: function() {
+    calendar.changeMonth(this, 1)
+  },
+
+  /**
+   * 点月日历里的某一天：回到列表，并从这天开始显示 7 天
+   */
+  onCalendarDayTap: function(e) {
+    calendar.dayTap(this, e.detail)
+  }
 })

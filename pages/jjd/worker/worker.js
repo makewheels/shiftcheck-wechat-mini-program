@@ -1,4 +1,5 @@
 var shift = require('../../../utils/shift.js')
+var calendar = require('../../../utils/calendar.js')
 
 Page({
   /**
@@ -15,6 +16,10 @@ Page({
     year: 0,
     month: 0,
     day: 0,
+    //视图：list 一周列表 / calendar 月日历
+    viewMode: "list",
+    //月日历的渲染数据
+    cal: null,
     //七行数据
     r1: "loading...",
     r2: "loading...",
@@ -70,6 +75,7 @@ Page({
     this.changeDate(1)
     this.setData({ r7: this.getDateString() + this.getWork() })
     this.changeDate(-6)
+    calendar.refresh(this)
   },
 
   /**
@@ -227,5 +233,44 @@ Page({
     wx.showToast({
       title: year + "-" + month + "-" + day
     })
+  },
+
+  /**
+   * 月日历里一格的内容
+   */
+  getDayCell: function(year, month, day) {
+    var self = this
+    return calendar.onDate(this, year, month, day, function() {
+      var text = self.getWork()
+      return { text: text, work: text !== "休息" }
+    })
+  },
+
+  /**
+   * 一周列表 / 月日历 切换
+   */
+  toggleView: function() {
+    calendar.toggleView(this)
+  },
+
+  /**
+   * 上一月按钮（月日历）
+   */
+  backMonth: function() {
+    calendar.changeMonth(this, -1)
+  },
+
+  /**
+   * 下一月按钮（月日历）
+   */
+  nextMonth: function() {
+    calendar.changeMonth(this, 1)
+  },
+
+  /**
+   * 点月日历里的某一天：回到列表，并从这天开始显示 7 天
+   */
+  onCalendarDayTap: function(e) {
+    calendar.dayTap(this, e.detail)
   }
 })
