@@ -1,3 +1,5 @@
+var shift = require('../../utils/shift.js')
+
 const AV = require('../../libs/av-core-min.js');
 
 Page({
@@ -198,7 +200,7 @@ Page({
     var banzuList = this.data.json.banzuList
     var periodList = this.data.json.periodList
     var restName = this.data.json.restName
-    var remainder = this.getTotalDays() % periodList.length
+    var remainder = shift.mod(this.getTotalDays(), periodList.length)
     //一天的班组索引，例如：4,0,0
     var banzuIndex = periodList[remainder]
     var banzuIndexArr = banzuIndex.split(",")
@@ -228,7 +230,7 @@ Page({
     var day = parseInt(startDateArr[2])
     var date1 = new Date(year, month, day);
     var date2 = new Date(this.data.year, this.data.month, this.data.day)
-    var daysBetween = parseInt(Math.abs(date2 - date1) / 1000 / 60 / 60 / 24)
+    var daysBetween = shift.daysBetween(date1, date2)
     // console.log(this.data.day + "day")
     // console.log("daysBetween" + daysBetween)
     return daysBetween

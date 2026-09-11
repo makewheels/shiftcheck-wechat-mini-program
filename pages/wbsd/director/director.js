@@ -1,3 +1,5 @@
+var shift = require('../../../utils/shift.js')
+
 Page({
   data: {
     //模式名
@@ -140,7 +142,7 @@ Page({
   getTotalDays: function() {
     var date1 = new Date(2016, 6, 7);
     var date2 = new Date(this.data.year, this.data.month, this.data.day)
-    var days = parseInt(Math.abs(date2 - date1) / 1000 / 60 / 60 / 24)
+    var days = shift.daysBetween(date1, date2)
     return days
   },
 
@@ -174,7 +176,7 @@ Page({
    */
   getYizhi: function() {
     var total = this.getTotalDays()
-    var remainder = total % 5
+    var remainder = shift.mod(total, 5)
     if (remainder == 0) {
       return "一班"
     } else if (remainder == 1) {
@@ -193,7 +195,7 @@ Page({
    */
   getErzhi: function() {
     var total = this.getTotalDays()
-    var remainder = total % 5
+    var remainder = shift.mod(total, 5)
     if (remainder == 0) {
       return "三班"
     } else if (remainder == 1) {
@@ -212,7 +214,7 @@ Page({
    */
   getSanzhi: function() {
     var total = this.getTotalDays()
-    var remainder = total % 5
+    var remainder = shift.mod(total, 5)
     if (remainder == 0) {
       return "五班"
     } else if (remainder == 1) {
