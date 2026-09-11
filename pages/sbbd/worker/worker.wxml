@@ -1,4 +1,4 @@
-<view class="container">
+<view class="container {{viewMode === 'calendar' ? 'calendar-mode' : ''}}">
   <view class="subtitle">三班半倒：{{modeName}}模式</view>
   <text id="currentBanzu">当前班组：{{banzuName}}</text>
   <view class="flex-wrap">
@@ -6,20 +6,32 @@
     <button class="btn_banzu" bindtap="setBanzu2">二班</button>
     <button class="btn_banzu" bindtap="setBanzu3">三班</button>
   </view>
-  <text>{{r1}}</text>
-  <text>{{r2}}</text>
-  <text>{{r3}}</text>
-  <text>{{r4}}</text>
-  <text>{{r5}}</text>
-  <text>{{r6}}</text>
-  <text>{{r7}}</text>
   <view class="flex-wrap">
-    <button bindtap="backDay">前 一 天</button>
-    <button bindtap="nextDay">后 一 天</button>
+    <button bindtap="toggleView">{{viewMode === 'calendar' ? '切回一周列表' : '切换成月日历'}}</button>
   </view>
-  <view class="flex-wrap">
-    <button class="yellow" bindtap="backWeek">上 一 周</button>
-    <button class="yellow" bindtap="nextWeek">下 一 周</button>
+  <block wx:if="{{viewMode === 'list'}}">
+    <text>{{r1}}</text>
+    <text>{{r2}}</text>
+    <text>{{r3}}</text>
+    <text>{{r4}}</text>
+    <text>{{r5}}</text>
+    <text>{{r6}}</text>
+    <text>{{r7}}</text>
+  </block>
+  <shift-calendar wx:else cal="{{cal}}" bind:daytap="onCalendarDayTap"></shift-calendar>
+  <block wx:if="{{viewMode === 'list'}}">
+    <view class="flex-wrap">
+      <button bindtap="backDay">前 一 天</button>
+      <button bindtap="nextDay">后 一 天</button>
+    </view>
+    <view class="flex-wrap">
+      <button class="yellow" bindtap="backWeek">上 一 周</button>
+      <button class="yellow" bindtap="nextWeek">下 一 周</button>
+    </view>
+  </block>
+  <view class="flex-wrap" wx:else>
+    <button class="yellow" bindtap="backMonth">上 一 月</button>
+    <button class="yellow" bindtap="nextMonth">下 一 月</button>
   </view>
   <view class="flex-wrap">
     <button bindtap="toToday" type="primary">返回今天</button>
