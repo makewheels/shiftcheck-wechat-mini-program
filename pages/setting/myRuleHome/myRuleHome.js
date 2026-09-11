@@ -119,26 +119,5 @@ Page({
         })
       }
     });
-  },
-
-  //设置主页默认打开页面
-  setHomepage: function() {
-    wx.showActionSheet({
-      itemList: ['DIY规则', '默认'],
-      success: function(res) {
-        var index = res.tapIndex
-        if (index == 0) {
-          wx.setStorageSync('homepage', 'diy')
-          wx.showToast({
-            title: '已设为DIY！'
-          })
-        } else {
-          wx.setStorageSync('homepage', 'default')
-          wx.showToast({
-            title: '已设为默认！'
-          })
-        }
-      }
-    })
   }
 })
