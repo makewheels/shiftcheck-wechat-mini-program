@@ -1,11 +1,7 @@
 const AV = require('../../libs/av-core-min.js');
 
 var UseMessage = AV.Object.extend('UseMessage');
-var Avatar = AV.Object.extend('Avatar');
 var app = getApp()
-
-// 在页面中定义激励视频广告
-let videoAd = null
 
 Page({
   data: {
@@ -40,60 +36,50 @@ Page({
     })
   },
 
-  //mystep2
+  //上报本次使用信息
+  //只上报设备与网络等基础信息：不读剪贴板、不查 IP
   mystep2: function(time, wxnet) {
-    var openid = app.getOpenid()
-    //还没登录上就不上报，原来这里直接 AV.User.current().toJSON() 会崩
-    if (!openid || openid == "o9K4b0QW0Yz2wosJeEIIk7QJo8Cg") {
-      return
-    }
-    //屏幕亮度
-    wx.getScreenBrightness({
-      success: function(screenBrightness) {
-        //剪切板
-        wx.getClipboardData({
-          success: function(clipboard) {
-            //ip
-            wx.request({
-              url: 'https://api.ip138.com/query/?&token=12ff932c7f7d8e7349f9a09b74a88129',
-              //2da165bab314e2b8749f5457728b1b72
-              success: function(ip) {
-                //系统信息
-                var res = wx.getSystemInfoSync()
-                const useMessage = new UseMessage({
-                  //时间
-                  time: time,
-                  //场景值
-                  scene: app.globalData.launchScene.scene,
-                  //用户标识
-                  openid: openid,
-                  //网络信息
-                  networkType: wxnet.networkType,
-                  ipjson: ip.data,
-                  //系统信息
-                  screenBrightness: screenBrightness.value,
-                  clipboard: clipboard.data,
-                  brand: res.brand,
-                  model: res.model,
-                  pixelRatio: res.pixelRatio,
-                  screenWidth: res.screenWidth,
-                  screenHeight: res.screenHeight,
-                  windowWidth: res.windowWidth,
-                  windowHeight: res.windowHeight,
-                  statusBarHeight: res.statusBarHeight,
-                  language: res.language,
-                  version: res.version,
-                  system: res.system,
-                  platform: res.platform,
-                  fontSizeSetting: res.fontSizeSetting,
-                  SDKVersion: res.SDKVersion
-                }).save()
-              }
-            })
-          }
-        })
+    app.withOpenid(function(openid) {
+      if (openid == "o9K4b0QW0Yz2wosJeEIIk7QJo8Cg") {
+        return
       }
-    });
+      //屏幕亮度
+      wx.getScreenBrightness({
+        success: function(screenBrightness) {
+          //系统信息
+          wx.getSystemInfo({
+            success: function(res) {
+              new UseMessage({
+                //时间
+                time: time,
+                //场景值
+                scene: app.globalData.launchScene.scene,
+                //用户标识
+                openid: openid,
+                //网络信息
+                networkType: wxnet.networkType,
+                //系统信息
+                screenBrightness: screenBrightness.value,
+                brand: res.brand,
+                model: res.model,
+                pixelRatio: res.pixelRatio,
+                screenWidth: res.screenWidth,
+                screenHeight: res.screenHeight,
+                windowWidth: res.windowWidth,
+                windowHeight: res.windowHeight,
+                statusBarHeight: res.statusBarHeight,
+                language: res.language,
+                version: res.version,
+                system: res.system,
+                platform: res.platform,
+                fontSizeSetting: res.fontSizeSetting,
+                SDKVersion: res.SDKVersion
+              }).save()
+            }
+          })
+        }
+      })
+    })
   },
 
   //事件处理函数
