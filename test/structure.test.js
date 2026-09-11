@@ -123,6 +123,29 @@ test('wxml 里 bind/catch 绑定的处理函数在对应 js 中都存在', funct
   assert.deepStrictEqual(missing, [], '这些事件处理函数在 js 里找不到：' + missing.join('; '))
 })
 
+test('sitemap.json 规则合法：引用的页面都已注册，且最后一条是兜底 disallow', function () {
+  const sitemap = JSON.parse(fs.readFileSync(path.join(mp.REPO, 'sitemap.json'), 'utf8'))
+  assert.ok(Array.isArray(sitemap.rules) && sitemap.rules.length > 0, 'sitemap.json 应有 rules')
+  sitemap.rules.forEach(function (r) {
+    assert.ok(r.action === 'allow' || r.action === 'disallow', '未知的 action: ' + r.action)
+    assert.ok(typeof r.page === 'string' && r.page.length > 0, '规则缺少 page')
+    if (r.page !== '*') {
+      assert.ok(registered.has(r.page), 'sitemap 里引用了未注册的页面：' + r.page)
+    }
+  })
+  const last = sitemap.rules[sitemap.rules.length - 1]
+  assert.strictEqual(last.action, 'disallow', '最后一条应是兜底 disallow，否则等于全开放')
+  assert.strictEqual(last.page, '*', '兜底规则应作用于所有页面')
+  // 含个人信息输入的页面绝不能被索引
+  const SENSITIVE = ['accountHome', 'updateMail', 'updatePhone', 'pushHome', 'newPushMission', 'importRuleByKey', 'myRuleHome', 'diyPush']
+  const allowed = sitemap.rules.filter(function (r) { return r.action === 'allow' }).map(function (r) { return r.page })
+  SENSITIVE.forEach(function (kw) {
+    allowed.forEach(function (p) {
+      assert.ok(p.indexOf(kw) === -1, '含个人信息/未验证的页面不该被索引：' + p)
+    })
+  })
+})
+
 test('project.config.json 用的是正式 appid，不是游客 appid', function () {
   const cfg = JSON.parse(fs.readFileSync(path.join(mp.REPO, 'project.config.json'), 'utf8'))
   assert.strictEqual(cfg.compileType, 'miniprogram')
