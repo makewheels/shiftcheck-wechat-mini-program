@@ -40,12 +40,6 @@ Page({
     })
   },
 
-  //我的获取本次使用信息
-  onShow: function() {
-    //检查更新
-    this.checkAppUpdate()
-  },
-
   //mystep2
   mystep2: function(time, wxnet) {
     var user = AV.User.current().toJSON()
@@ -100,21 +94,6 @@ Page({
         })
       }
     });
-  },
-
-  //检查app更新，如有更新，自动强制更新
-  checkAppUpdate: function() {
-    wx.getUpdateManager().onCheckForUpdate(function(res) {
-      if (res.hasUpdate) {
-        wx.showToast({
-          title: '小程序更新，稍后将自动重启...',
-          icon: 'none'
-        })
-        wx.getUpdateManager().onUpdateReady(function() {
-          wx.getUpdateManager().applyUpdate();
-        })
-      }
-    })
   },
 
   //事件处理函数
