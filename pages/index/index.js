@@ -132,31 +132,4 @@ Page({
       url: '../jjd/director/director'
     })
   },
-
-  //跳转到我的DIY规则页面
-  toMyDiy: function() {
-    wx.showToast({
-      title: '请稍候',
-      icon: 'loading',
-      duration: 20000
-    });
-    app.withOpenid(function(openid) {
-      var query = new AV.Query('UserRule');
-      query.equalTo('openid', openid);
-      query.find().then(function(userRules) {
-        if (userRules.length == 0) {
-          wx.showModal({
-            title: '提示',
-            content: '尚未导入规则！',
-            showCancel: false
-          })
-          wx.hideToast()
-        } else {
-          wx.navigateTo({
-            url: '../diy/diy'
-          })
-        }
-      })
-    })
-  }
 })
