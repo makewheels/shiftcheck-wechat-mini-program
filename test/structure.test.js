@@ -37,6 +37,16 @@ test('app.json 注册的每个页面文件齐全且非空', function () {
   assert.ok(fs.existsSync(path.join(mp.REPO, appJson.sitemapLocation || 'sitemap.json')), 'sitemap 文件不存在')
 })
 
+test('页面 json 不许声明 component:true（否则被当组件处理，页面注册不上、跳过去白屏）', function () {
+  const bad = []
+  appJson.pages.forEach(function (p) {
+    const j = JSON.parse(fs.readFileSync(path.join(mp.REPO, p + '.json'), 'utf8'))
+    if (j.component === true) bad.push(p + '.json')
+  })
+  assert.deepStrictEqual(bad, [],
+    '这些在 app.json 里注册为页面的 json 声明了 "component": true，会导致页面打不开：' + bad.join(', '))
+})
+
 test('磁盘上的页面目录都在 app.json 注册（不留进不去的死页面）', function () {
   const dirs = new Set()
   allFiles.forEach(function (f) {
