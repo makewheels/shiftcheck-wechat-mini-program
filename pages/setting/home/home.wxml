@@ -1,9 +1,7 @@
 <view class="container">
   <text id="title">设置主页</text>
-  <button bindtap="toAccountHome" type="default">我的账户</button>
   <button bindtap="toMyRule" type="default">我的DIY规则</button>
   <button bindtap="toWorkerDefaultBanzu" type="default">个人模式默认班组</button>
-  <button bindtap="toPushHome" type="default">订阅上班推送</button>
   <text class='tail'>version:{{appVersion}}</text>
   <text class='tail'>由衷地感谢您的支持！</text>
   <view class="ad-banner">
