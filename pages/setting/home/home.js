@@ -11,33 +11,9 @@ Page({
     })
   },
 
-  //打开页面先干掉加载框（可能是从授权页，因为拒绝，回来的）
+  //打开页面先干掉加载框（其它页面可能还挂着 20 秒的 loading toast）
   onShow: function() {
     wx.hideToast()
-  },
-
-  /**
-   * 检查是否授权用户信息
-   * url:如果已经授权，直接跳转的路径
-   * 如果没授权，前往授权页面授权
-   * success:授权成功从授权页面跳转的路径
-   * fail:授权失败从授权页面跳转的路径
-   */
-  checkAuthUserInfo: function(url, success, fail) {
-    wx.getSetting({
-      success: (res) => {
-        var isAuth = res.authSetting['scope.userInfo']
-        if (isAuth) {
-          wx.navigateTo({
-            url: url
-          })
-        } else {
-          wx.navigateTo({
-            url: '../authUserInfo/authUserInfo?success=' + success + '&fail=' + fail
-          })
-        }
-      }
-    })
   },
 
   //设置默认班组
@@ -49,10 +25,9 @@ Page({
 
   //我的DIY规则
   toMyRule: function() {
-    var url = '../myRuleHome/myRuleHome'
-    var success = '../myRuleHome/myRuleHome'
-    var fail = '../home/home'
-    this.checkAuthUserInfo(url, success, fail);
+    wx.navigateTo({
+      url: '../myRuleHome/myRuleHome'
+    })
   },
 
   //订阅上班推送
@@ -62,7 +37,6 @@ Page({
       icon: 'loading',
       duration: 20000
     });
-    var that = this
     var query = new AV.Query('WechatUser');
     query.equalTo('openid', AV.User.current().toJSON().authData.lc_weapp.openid);
     query.find().then(function(users) {
@@ -77,10 +51,9 @@ Page({
           showCancel: false
         })
       } else {
-        var url = '../pushHome/pushHome'
-        var success = '../pushHome/pushHome'
-        var fail = '../home/home'
-        that.checkAuthUserInfo(url, success, fail);
+        wx.navigateTo({
+          url: '../pushHome/pushHome'
+        })
       }
     });
   },
