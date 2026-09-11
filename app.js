@@ -2,7 +2,6 @@ const AV = require('./libs/av-core-min.js');
 const adapters = require('./libs/leancloud-adapters-weapp.js');
 
 // const AV = require('./libs/av-weapp-min.js')
-// var mta = require('./libs/mta_analysis.js')
 
 AV.setAdapters(adapters);
 AV.init({
