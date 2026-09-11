@@ -39,6 +39,20 @@ leancloud 改用专有域名 api.leancloud.mp.shiftcheck.work
 新增 test/ 测试套件（136 项，node:test 零依赖）与 GitHub Actions 门禁（已设为 master 必需检查）
 新增 AGENTS.md（仓库须知与陷阱清单）；变更记录文件名统一带时分秒
 
+## 2.5.0
+删除整条「上班推送」链路（pushHome / newPushMission / updateMail / updatePhone / accountHome）：
+创建任务的入口自 2.2.x 起就被一句裸 return 堵死，PushMission 表与 7 个推送字段全部只写不读，
+真正发信的定时任务在已停用的后端仓库里 —— 用户填了真实邮箱手机号也永远收不到
+删除整条 DIY 自定义规则链路（diy / diyPush / importRuleByKey / myRuleHome）：
+全仓库没有任何代码能创建 Rule / RuleKey，激活码对新用户 100% 报「激活码错误」且无处申请
+注册页面 20 → 11，小程序收敛成「纯离线查班工具」：8 个倒班页全部本地计算，
+只有首页的使用统计上报还连 LeanCloud
+微信隐私接口归零（剪贴板随激活码导入页一起删除），《用户隐私保护指引》不再有必须声明的接口项
+广告位从 3 个减到 1 个（激励视频与 diy 的 banner 随页面删除）
+顺带消掉的问题：20 秒卡死的 loading toast（15 处全在已删页面里）、
+updateMail/updatePhone 的 users[0] 未判空崩溃、accountHome 的 save 竞态、
+pushHome 三个开关的乐观更新+静默失败、激活码被烧毁还提示成功
+
 ## 变更规范
 
 - 所有改动必须走分支 + Pull Request（默认分支 `master` 已开启保护，禁止直接 push）。

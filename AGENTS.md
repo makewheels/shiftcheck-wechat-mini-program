@@ -99,8 +99,12 @@ node --test test/*.test.js
 
 - **不要**加回任何静默采集。历史上有过：首页启动后静默读剪贴板、请求 ip138 查 IP、连同设备信息入库，
   2.4.0 已移除。剪贴板与 IP 都属于微信"用户隐私接口"，必须在后台《用户隐私保护指引》声明并处理授权弹窗
-- 现存唯一的隐私接口调用是 `pages/setting/importRuleByKey/importRuleByKey.js` 的 `wx.getClipboardData`，
-  由用户点「一键粘贴」主动触发，属正当用法，但**依赖后台已声明"剪贴板"**
+- **2.5.0 之后全仓库没有任何微信隐私接口调用**（剪贴板随 DIY 激活码导入页删除、
+  邮箱手机号随推送链路删除、从来没有定位）。这意味着后台《用户隐私保护指引》没有必须声明的接口项 ——
+  这是个很值钱的性质，`hygiene.test.js` 用**零容忍**门禁守着：剪贴板 / 定位 / 收货地址一出现就红。
+  要加任何隐私接口之前，先想清楚是不是真的需要，并且同步更新后台声明与 `doc/发布前检查单.md`
+- 现在只有首页的使用统计上报还连 LeanCloud（`pages/index/index.js` 的 `mystep2()`）；
+  **8 个倒班页与设置页都是纯本地计算，断网也能查班** —— 不要让它们开始依赖网络或登录态
 - 不要把任何 token / key / secret 写进代码。历史上硬编码过两个 ip138 token，随公开仓库泄露，只能作废重置
 - 已废弃 API 不要再用：`wx.getSystemInfoSync`（用 `wx.getSystemInfo`）、`wx.getUserInfo`、`wx.getUserProfile`
   （都只返回匿名数据）。要头像昵称用官方的"头像昵称填写能力"：
@@ -123,7 +127,7 @@ node --test test/*.test.js
 
 ```
 app.js / app.json / app.wxss   全局逻辑、页面注册、全局样式
-pages/                         页面（index 首页、4 种倒班 × worker/director、diy、setting/*）
+pages/                         11 个页面：index 首页、4 种倒班 × worker/director、setting/home、setting/workerDefaultBanzu
 components/shift-calendar/     月日历自定义组件
 utils/shift.js                 日期与取模（有符号天数差、负数取模）
 utils/calendar.js              月日历渲染数据与交互
