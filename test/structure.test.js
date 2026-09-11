@@ -146,6 +146,24 @@ test('sitemap.json 规则合法：引用的页面都已注册，且最后一条�
   })
 })
 
+test('「返回主页」类处理函数必须处理页面栈只有 1 层的深链场景', function () {
+  // 倒班页在 sitemap 白名单里，可被搜一搜/扫码/分享卡片直接打开，此时页面栈深度为 1，
+  // 无条件 navigateBack 会静默失败（连 fail 回调都没有），按钮点了没反应
+  const problems = []
+  jsFiles.forEach(function (f) {
+    const src = fs.readFileSync(f, 'utf8')
+    if (!/close:\s*function\s*\(\)/.test(src)) return
+    if (!/wx\.navigateBack/.test(src)) return
+    if (!/getCurrentPages\(\)/.test(src)) {
+      problems.push(mp.rel(f) + ' 的 close() 调了 navigateBack 却没判页面栈深度')
+    }
+  })
+  assert.deepStrictEqual(problems, [],
+    '深链进入时「返回主页」会失效，栈深 <=1 应改用 reLaunch：\n' + problems.join('\n'))
+  assert.ok(jsFiles.some(function (f) { return /close:\s*function/.test(fs.readFileSync(f, 'utf8')) }),
+    '一个 close() 都没扫到，检查范围可能写错了')
+})
+
 test('project.config.json 用的是正式 appid，不是游客 appid', function () {
   const cfg = JSON.parse(fs.readFileSync(path.join(mp.REPO, 'project.config.json'), 'utf8'))
   assert.strictEqual(cfg.compileType, 'miniprogram')
