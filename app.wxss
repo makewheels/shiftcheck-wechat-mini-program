@@ -21,3 +21,12 @@ text {
 .ad-banner {
   margin-top:10rpx;
 }
+
+/* 月日历模式：顶部不留那么大空白，高度交给内容，超出一屏可以滚动 */
+.container.calendar-mode {
+  height: auto;
+  min-height: 100%;
+  padding-top: 20rpx;
+  padding-bottom: 30rpx;
+  justify-content: flex-start;
+}
