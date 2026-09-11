@@ -1,4 +1,5 @@
 const AV = require('../../../libs/av-core-min.js');
+var app = getApp()
 Page({
   data: {
     setOrUpdate: "设置",
@@ -22,7 +23,7 @@ Page({
   input: function() {
     var that = this
     var input = this.data.inputValue
-    var openid = AV.User.current().toJSON().authData.lc_weapp.openid
+    var openid = app.getOpenid()
     if (input.length != 11) {
       wx.showModal({
         title: '提示',
