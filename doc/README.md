@@ -16,6 +16,12 @@
 - 参考：`doc/changes/2026-09-11-212046-doc-rules-and-todo.md`（最早的一份记录）。
   全部记录都已统一成带时分秒的格式；`test/hygiene.test.js` 会校验文件名格式、时间合法性与时间戳不重复
 
+## 发版
+
+- 每个版本都要**打 annotated tag + 建 GitHub Release**，顺序与命令见 `doc/发布前检查单.md` 第 8 节
+- 顺序是：README 更新日志写全 → 改 `app.js` 的 `appVersion` → CI 绿并合并 → 打 tag → 建 Release → 上传微信
+- 版本号一致性由 `test/hygiene.test.js` 守着（`app.js` 的 `appVersion` 必须等于 README 更新日志里最新的版本号）
+
 ## 待办
 
 - 未完成事项记录在 `doc/TODO.md`，信息不全时先留空占位，确认后再实现。
