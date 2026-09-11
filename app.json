@@ -13,11 +13,6 @@
     "pages/setting/workerDefaultBanzu/workerDefaultBanzu",
     "pages/setting/myRuleHome/myRuleHome",
     "pages/setting/importRuleByKey/importRuleByKey",
-    "pages/setting/pushHome/pushHome",
-    "pages/setting/accountHome/accountHome",
-    "pages/setting/updateMail/updateMail",
-    "pages/setting/updatePhone/updatePhone",
-    "pages/setting/newPushMission/newPushMission",
     "pages/diy/diy",
     "pages/diyPush/diyPush"
   ],

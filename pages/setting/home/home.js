@@ -1,4 +1,3 @@
-const AV = require('../../../libs/av-core-min.js');
 var app = getApp()
 
 Page({
@@ -27,43 +26,6 @@ Page({
   toMyRule: function() {
     wx.navigateTo({
       url: '../myRuleHome/myRuleHome'
-    })
-  },
-
-  //订阅上班推送
-  toPushHome: function() {
-    wx.showToast({
-      title: '请稍候',
-      icon: 'loading',
-      duration: 20000
-    });
-    app.withOpenid(function(openid) {
-      var query = new AV.Query('WechatUser');
-      query.equalTo('openid', openid);
-      query.find().then(function(users) {
-        if (users.length == 0 || users[0].get('mail') == undefined || users[0].get('mail') == "") {
-          wx.hideToast()
-          wx.navigateTo({
-            url: '../accountHome/accountHome',
-          })
-          wx.showModal({
-            title: '提示',
-            content: '请先设置邮箱和手机！',
-            showCancel: false
-          })
-        } else {
-          wx.navigateTo({
-            url: '../pushHome/pushHome'
-          })
-        }
-      });
-    })
-  },
-
-  //我的账户
-  toAccountHome: function() {
-    wx.navigateTo({
-      url: '../accountHome/accountHome',
     })
   }
 })
