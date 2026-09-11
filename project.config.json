@@ -36,7 +36,10 @@
     "minifyWXML": true,
     "showES6CompileOption": false,
     "useCompilerPlugins": false,
-    "ignoreUploadUnusedFiles": true
+    "ignoreUploadUnusedFiles": true,
+    "compileWorklet": false,
+    "localPlugins": false,
+    "condition": false
   },
   "compileType": "miniprogram",
   "libVersion": "2.8.2",
@@ -45,11 +48,6 @@
   "isGameTourist": false,
   "simulatorType": "wechat",
   "simulatorPluginLibVersion": {},
-  "scripts": {
-    "beforeCompile": "",
-    "beforePreview": "",
-    "beforeUpload": ""
-  },
   "condition": {
     "search": {
       "list": []
@@ -67,5 +65,10 @@
     "miniprogram": {
       "list": []
     }
-  }
+  },
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "editorSetting": {}
 }
