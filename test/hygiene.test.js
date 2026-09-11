@@ -153,6 +153,13 @@ test('已删除的死代码不许回来', function () {
 
 /* ---------------- 仓库卫生 ---------------- */
 
+test('不要把位运算 & 当逻辑与 && 用', function () {
+  // 形如 `if (a != null & b != undefined)`：靠 true&true===1 的巧合能跑，
+  // 但失去短路求值，操作数一旦不是布尔值结果立刻错乱
+  assert.deepStrictEqual(codeHits(/[!=]==?\s*[^&\s][^&\n]*\s&\s[^&]/), [],
+    '疑似把 & 当 && 用；位运算请写明意图')
+})
+
 test('没有残留的合并冲突标记', function () {
   assert.deepStrictEqual(allHits(/^<{7}\s|^={7}$|^>{7}\s/), [], '有未解决的合并冲突标记')
 })

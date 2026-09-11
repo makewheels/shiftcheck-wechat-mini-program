@@ -63,7 +63,7 @@ Page({
         }
         //天气预报城市显示
         var city = user.get('pushCity')
-        if (city != null & city != undefined && city != "") {
+        if (city != null && city != undefined && city != "") {
           that.setData({
             city: city
           })
