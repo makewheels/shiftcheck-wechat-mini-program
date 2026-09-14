@@ -30,37 +30,17 @@ App({
   },
 
   /**
-   * 确保已经登录，拿到 openid 之后执行 cb(openid)
-   * 登录不上就提示用户，不执行 cb，避免页面拿着 null 去查数据
+   * 这里曾经有一对「拿不到 openid 就补登录、补不上就弹阻塞式模态框」的方法，已删除，别加回来。
+   *
+   * 全仓库没有任何功能真的需要登录态：8 个倒班页与设置页都是纯本地计算，
+   * 那对方法唯一的调用方是首页的使用统计上报（纯后台行为）。结果是用户只想查今天上什么班，
+   * 却因为一个统计请求失败被模态框拦住 —— 网络不通或后端域名失效时，每个用户一打开首页必中。
+   *
+   * hygiene.test.js 有门禁守着不许复活；来龙去脉见 AGENTS.md「改页面时」与
+   * doc/changes/ 里 2026-09-14 的那条记录。
+   *
+   * 要 openid 就用上面的 getOpenid()：同步、拿不到返回 null，由调用方自己决定静默跳过。
    */
-  withOpenid: function(cb) {
-    var that = this
-    var openid = this.getOpenid()
-    if (openid) {
-      cb(openid)
-      return
-    }
-    AV.User.loginWithMiniApp().then(function(user) {
-      that.globalData.user = user
-      var openidAfterLogin = that.getOpenid()
-      if (openidAfterLogin) {
-        cb(openidAfterLogin)
-      } else {
-        that.loginFailTip()
-      }
-    }, function() {
-      that.loginFailTip()
-    })
-  },
-
-  loginFailTip: function() {
-    wx.hideToast()
-    wx.showModal({
-      title: '提示',
-      content: '登录没成功，请检查网络后重新打开小程序',
-      showCancel: false
-    })
-  },
 
   /**
    * 小程序强制升级

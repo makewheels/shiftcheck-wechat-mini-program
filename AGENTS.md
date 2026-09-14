@@ -72,9 +72,14 @@ node --test test/*.test.js
 
 ## 改页面时
 
-- 取 openid **只能**用 `app.getOpenid()`（同步、未登录返回 `null`）或 `app.withOpenid(cb)`（未登录先补登录，
-  失败则提示且不执行 cb）。**不要**写 `AV.User.current().toJSON()`：未登录时 `current()` 是 `null`，
+- 取 openid **只能**用 `app.getOpenid()`（同步、未登录返回 `null`），拿不到就由调用方自己静默跳过。
+  **不要**写 `AV.User.current().toJSON()`：未登录时 `current()` 是 `null`，
   直接 `.toJSON()` 就 TypeError 白屏。这个坑踩过两次（README 2.3.3 记过一次，2.4.0 又统一收了 21 处）
+- **后台行为失败不许弹框打扰用户。** `app.js` 里曾经有一对「取不到 openid 就补登录、
+  补不上就弹阻塞式 `showModal`」的方法，唯一调用方是首页的使用统计上报 ——
+  而首页 8 个倒班入口全是本地计算、根本不需要登录。结果网络不通或后端域名失效时，
+  每个用户一打开首页就被拦一下。已整对删除，`hygiene.test.js` 有门禁守着不许复活。
+  判断标准很简单：**这个调用失败了，用户会在意吗？** 不会就静默 return，别弹任何东西
 - 查询结果取 `[0]` 前先判空（LeanCloud 查不到就是空数组）
 - 新增倒班页要接月日历的话：`data` 加 `viewMode`/`cal`，实现一个 `getDayCell(year, month, day)`，
   加 4 个一行转发方法（`toggleView`/`backMonth`/`nextMonth`/`onCalendarDayTap`），

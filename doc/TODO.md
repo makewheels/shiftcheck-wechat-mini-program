@@ -96,13 +96,25 @@ LeanCloud 后台的 `WechatUser` / `PushMission` / `Rule` / `RuleKey` / `UserRul
       `<picker mode="date">`。逻辑可以直接从 `pages/wbsd/worker/worker.js` 的 `bindDateChange` 抄
 - [ ] **`pages/index/index.wxml` 用了 2 处 HTML 的 `<span>`**（单位名标签），
       同页其它分组标签用的是 `<text>`。开发者工具会告警，应统一成 `<text>`
-- [ ] **断网时首页会弹一次「登录没成功」**（2.4.0 引入的副作用，优先级最高的一条）：
-      首页 `mystep2()` 的使用统计上报走了 `app.withOpenid()`，登录失败时它会调 `loginFailTip()` 弹模态框。
-      但**首页 8 个倒班入口全是纯本地计算，根本不需要登录** —— 用户只想看今天上什么班，
-      却被告知登录失败。`wx.getNetworkType` 在断网时也会 success，所以离线场景必定触发。
-      **最坏的发布事故形态**：如果发布时漏配 request 域名白名单，所有用户一打开就看到这个弹窗。
-      修法：`mystep2` 改用静默路径（`app.getOpenid()`，拿不到就直接 return，不弹任何提示），
-      `loginFailTip` 只留给真正需要登录的入口（现在这样的入口已经一个都不剩了）
+- [x] ~~**断网时首页会弹一次「登录没成功」**~~ —— **2026-09-14 已修**（发布前发现的最后一条阻塞项）。
+      原先首页 `mystep2()` 的统计上报走"取不到 openid 就补登录、补不上就弹阻塞式 `showModal`"的路径，
+      而**首页 8 个倒班入口全是纯本地计算、根本不需要登录**，用户只想查班却被拦住。
+      修法比原计划更彻底：`mystep2` 改走 `app.getOpenid()` 静默路径，
+      并把 `app.js` 里那对方法**整对删除**（修完零调用方，留着只是给未来一个能弹框的入口），
+      `hygiene.test.js` 加门禁守着不许复活，`index-page.test.js` 加 5 条测试钉住"静默"这个性质
+      （取不到 openid / undefined / 空串都不弹，取得到时照常上报，作者 openid 跳过）。
+      详见 `doc/changes/2026-09-14-142621-fix-login-fail-modal.md`
+- [ ] **⚠ LeanCloud 专有域名疑似已全球失效，整条统计上报链路是死的**（2026-09-14 发现）：
+      `api.leancloud.mp.shiftcheck.work` 在本机 **DNS 解析失败**（`getaddrinfo failed`），
+      经代理 CONNECT 也是 `502 Bad Gateway`。对照测试排除了"公司 DNS 整类封个人域名"：
+      同一台机器上 `oneclick.video`、`secrets.a4.fit` 都能正常解析，
+      而 `shiftcheck.work` 的 apex 与 `mp` / `leancloud.mp` / `api.leancloud.mp` **三级子域全挂**。
+      **但公司代理按类别封了 DoH 服务，所以无法从内网确认全球解析状态** —— 需要用手机流量或
+      另一台机器开一次 `https://api.leancloud.mp.shiftcheck.work` 才能定论。
+      如果确实死了，两件事要决定：① 使用统计还要不要（要就修 DNS / 换 LeanCloud 域名，
+      不要就把 `mystep2` + `UseMessage` 整条删掉）；② **`libs/` 里的 LeanCloud SDK 占 237.6 KB，
+      是 260.9 KB 上传包的 91%** —— 后端一旦确认弃用，删掉它包体能降到 ~25 KB
+      （注意 `app.js` 的 `getOpenid()` 也依赖 `AV.User.current()`，要一并处理）
 - [ ] **首页使用统计的口径是错的**（不影响用户，只影响你自己的数据）：
       `index.js` 没有 `onShow` → **热启动一次都不上报**，只有冷启动上报；
       `app.js` 没有 `onShow` → `globalData.launchScene.scene` **永远是冷启动那次的场景值**，

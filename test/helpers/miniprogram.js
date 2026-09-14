@@ -95,12 +95,12 @@ function makeWxStub(storage, calls, apiLog) {
 const WX_STUB = makeWxStub(null)
 
 // getApp() 替身：页面里会用到 globalData 与 openid 相关方法
+// 注：这里曾经还替身了 withOpenid / loginFailTip —— 那两个方法已从 app.js 删除
+//（"取不到 openid 就弹框挡住用户"，是 2.4.0 的发布级 bug），hygiene.test.js 有门禁守着不许复活
 function appStub(overrides) {
   return Object.assign({
     globalData: { appVersion: 'test', launchScene: { scene: 0 } },
-    getOpenid: function () { return 'test-openid' },
-    withOpenid: function (cb) { cb('test-openid') },
-    loginFailTip: function () {}
+    getOpenid: function () { return 'test-openid' }
   }, overrides || {})
 }
 
@@ -119,12 +119,17 @@ function loadConfig(file, opts) {
   const code = fs.readFileSync(file, 'utf8')
   // opts.pageStack 控制 getCurrentPages() 返回的页面栈，用来测深链场景（栈深只有 1）
   const pageStack = (opts && opts.pageStack) || [{}, {}]
+  // opts.app 传对象时覆盖 getApp() 的默认替身，用来测「取不到 openid」这类分支
+  //（默认替身总是返回一个 openid，所以那条分支不加这个口子根本测不到）
+  const getAppImpl = (opts && opts.app)
+    ? function () { return appStub(opts.app) }
+    : appStub
   new Function(
     'Page', 'Component', 'App', 'require', 'wx', 'getApp', 'getCurrentPages',
     'module', 'exports', '__dirname',
     code
   )(capture, capture, capture, makeRequire(file),
-    makeWxStub(opts && opts.storage, opts && opts.calls, opts && opts.apiLog), appStub,
+    makeWxStub(opts && opts.storage, opts && opts.calls, opts && opts.apiLog), getAppImpl,
     function () { return pageStack }, { exports: {} }, {}, path.dirname(file))
   if (!config) throw new Error('没能从 ' + file + ' 取到配置对象')
   return config

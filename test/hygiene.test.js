@@ -71,7 +71,7 @@ test('页面里不许直接写 AV.User.current().toJSON()（未登录会崩）',
 
 test('app.js 必须提供登录与升级相关方法，且升级回调注册方式正确', function () {
   const src = fs.readFileSync(path.join(mp.REPO, 'app.js'), 'utf8')
-  ;['getOpenid', 'withOpenid', 'loginFailTip', 'initUpdateManager', 'login'].forEach(function (fn) {
+  ;['getOpenid', 'initUpdateManager', 'login'].forEach(function (fn) {
     assert.match(src, new RegExp(fn + '\\s*:\\s*function'), 'app.js 缺少 ' + fn + '()')
   })
   assert.match(src, /onCheckForUpdate\(/)
@@ -158,6 +158,18 @@ test('已删除的死代码不许回来', function () {
   assert.ok(!fs.existsSync(path.join(mp.REPO, 'pages/setting/authUserInfo')),
     'scope.userInfo 授权已失效，该页面已删除，别加回来')
   assert.deepStrictEqual(codeHits(/scope\.userInfo|checkAuthUserInfo/), [], '失效的授权门禁不要复活')
+})
+
+test('「取不到 openid 就弹框挡住用户」那套不许复活', function () {
+  // app.js 里曾经有一对方法：拿不到 openid 就补登录，补不上就弹阻塞式 showModal。
+  // 全仓库没有任何功能真的需要登录态 —— 8 个倒班页与设置页都是纯本地计算，
+  // 那对方法唯一的调用方是首页的使用统计上报（纯后台行为）。
+  // 后果是发布级事故：用户只想查今天上什么班，却因为一个统计请求失败被模态框拦住，
+  // 网络不通或后端域名失效时每个用户一打开首页必中（2.4.0 真实发生过）。
+  // 这条门禁守的是"机制"而不是"文案"：换个提示措辞也应该被拦下。
+  assert.deepStrictEqual(codeHits(/\bwithOpenid\b|\bloginFailTip\b/), [],
+    '不要恢复这两个方法。要 openid 用 app.getOpenid()（同步，拿不到返回 null），' +
+    '由调用方自己静默跳过 —— 后台行为失败不该打扰用户')
 })
 
 /* ---------------- 仓库卫生 ---------------- */
