@@ -106,10 +106,10 @@ LeanCloud 后台的 `WechatUser` / `PushMission` / `Rule` / `RuleKey` / `UserRul
       详见 `doc/changes/2026-09-14-142621-fix-login-fail-modal.md`
 - [ ] **⚠ LeanCloud 专有域名疑似已全球失效，整条统计上报链路是死的**（2026-09-14 发现）：
       `api.leancloud.mp.shiftcheck.work` 在本机 **DNS 解析失败**（`getaddrinfo failed`），
-      经代理 CONNECT 也是 `502 Bad Gateway`。对照测试排除了"公司 DNS 整类封个人域名"：
+      经代理 CONNECT 也是 `502 Bad Gateway`。对照测试排除了"本机 DNS 整类封个人域名"：
       同一台机器上 `oneclick.video`、`secrets.a4.fit` 都能正常解析，
       而 `shiftcheck.work` 的 apex 与 `mp` / `leancloud.mp` / `api.leancloud.mp` **三级子域全挂**。
-      **但公司代理按类别封了 DoH 服务，所以无法从内网确认全球解析状态** —— 需要用手机流量或
+      **但本机所在网络的代理按类别封了 DoH 服务，所以无法从内网确认全球解析状态** —— 需要用手机流量或
       另一台机器开一次 `https://api.leancloud.mp.shiftcheck.work` 才能定论。
       如果确实死了，两件事要决定：① 使用统计还要不要（要就修 DNS / 换 LeanCloud 域名，
       不要就把 `mystep2` + `UseMessage` 整条删掉）；② **`libs/` 里的 LeanCloud SDK 占 237.6 KB，

@@ -253,6 +253,41 @@ test('app.js 的版本号与 README 更新日志里最新的版本一致', funct
   assert.strictEqual(m[1], latest, 'app.js 的 appVersion 与 README 最新版本号不一致（发版要两边一起改）')
 })
 
+test('当前版本必须有对应的发布说明 doc/releases/<version>.md', function () {
+  // 发布说明要以仓库文件为唯一事实源，GitHub Release 用 --notes-file 从它同步。
+  // 只写在 GitHub 网页上的后果：不能进 PR 评审、不能 diff、Release 被删就彻底没了。
+  const appSrc = fs.readFileSync(path.join(mp.REPO, 'app.js'), 'utf8')
+  const m = appSrc.match(/appVersion:\s*["'](\d+\.\d+\.\d+)["']/)
+  assert.ok(m, 'app.js 里找不到 appVersion')
+  const ver = m[1]
+  const rel = path.join(mp.REPO, 'doc', 'releases', ver + '.md')
+  assert.ok(fs.existsSync(rel),
+    '缺少 doc/releases/' + ver + '.md。发布说明必须先进仓库再同步到 GitHub Release：\n' +
+    '  gh release edit v' + ver + ' --notes-file doc/releases/' + ver + '.md\n' +
+    '约定见 doc/releases/README.md')
+
+  const txt = fs.readFileSync(rel, 'utf8')
+  assert.ok(txt.trim().length > 200, 'doc/releases/' + ver + '.md 太短，不像一份发布说明')
+  // Release 是某个版本的快照，而 master 会一直往前走：指向 master 的链接将来要么 404，
+  // 要么更糟 —— 点开看到的是另一个版本的内容，跟这条 Release 描述的东西对不上。
+  // 指向 tag 就永远解析到打 tag 那一刻的文件树，哪怕文件以后从 master 上删了也照样能打开。
+  assert.ok(!txt.includes('/blob/master/') && !txt.includes('/tree/master/'),
+    'doc/releases/' + ver + '.md 里有指向 master 的链接，要改成指向 tag v' + ver + '：\n' +
+    txt.split('\n').filter(function (l) { return l.includes('/master/') }).join('\n'))
+})
+
+test('doc/releases/ 下的文件名一律是 <version>.md', function () {
+  const dir = path.join(mp.REPO, 'doc', 'releases')
+  assert.ok(fs.existsSync(dir), 'doc/releases/ 目录不存在')
+  const files = fs.readdirSync(dir).filter(function (f) {
+    return f.endsWith('.md') && f !== 'README.md'
+  })
+  assert.ok(files.length > 0, 'doc/releases/ 里一份发布说明都没有')
+  const bad = files.filter(function (f) { return !/^\d+\.\d+\.\d+\.md$/.test(f) })
+  assert.deepStrictEqual(bad, [],
+    '文件名必须是 <version>.md（与 tag v<version> 去掉 v 对应）：' + bad.join(', '))
+})
+
 test('变更记录文件名一律是 YYYY-MM-DD-HHMMSS-简短说明.md', function () {
   const dir = path.join(mp.REPO, 'doc/changes')
   const files = fs.readdirSync(dir).filter(function (f) { return f.endsWith('.md') })

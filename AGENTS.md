@@ -23,7 +23,8 @@ node --test test/*.test.js
 - 六个测试文件：`shift`（日期与取模）、`holiday`（节假日数据自检）、`calendar`（月历几何与交互）、
   **`shift-pages`（最要紧：锚点守卫、周期性不变量、经警队实测班表、金标准快照、列表==日历）**、
   `structure`（页面注册/跳转目标/组件/wxml 处理函数齐全性）、`hygiene`（废弃 API、隐私接口位置、
-  硬编码凭据、死代码复活、版本号与 README 一致、变更记录文件名规范）
+  硬编码凭据、死代码复活、单文件行数上限、版本号与 README 一致、发布说明文件存在且链接指向 tag、
+  变更记录文件名规范）
 - `test/fixtures/golden-rows.json` 是金标准快照，锁定各页已校准的班次输出。
   **只有真实班表被重新校准后**才该更新：`GOLDEN_UPDATE=1 node --test test/shift-pages.test.js`
 - **写测试时不要用 `t.test()` 子测试**，一律展开成顶层 `test()`。
@@ -57,6 +58,13 @@ node --test test/*.test.js
    —— 这是公开仓库，提交身份统一用 `makewheels <makewheels@github.com>`
    （上面那行末尾的 `hygiene-allow-line` 标记是必须的：`hygiene.test.js` 会扫全仓库找署名，
    而这条规则本身必须写出被禁的字样。豁免只允许用在文档里，用在代码文件会被测试拦下）
+7. **发布说明先进仓库，再同步到 GitHub Release**：每个版本一份 `doc/releases/<version>.md`，
+   Release 正文用 `gh release create/edit --notes-file doc/releases/<version>.md` 从它生成。
+   **不要在 GitHub 网页上直接写或改 Release 正文** —— 仓库文件是唯一事实源，Release 只是它的投影；
+   反过来做的话仓库里这份会过期、两边漂、而且网页上写的东西进不了 PR 评审也不能 diff。
+   发布说明里的链接一律指向 tag（`/blob/vX.Y.Z/...`）而不是 `master`：Release 是版本快照，
+   master 会一直往前走，指向 master 的链接将来要么 404、要么点开是另一个版本的内容。
+   这三条都有门禁守着（`appVersion` 对应的文件必须存在、不能是空壳、不许出现 `/blob/master/`）
 
 ## 改排班逻辑前必读（最容易搞坏的地方）
 
@@ -176,5 +184,9 @@ utils/holiday.js               内置法定节假日数据（每年 11 月要手
 libs/                          LeanCloud SDK（第三方，不要改）
 test/                          node:test 测试套件 + 沙箱加载器 + 金标准 fixture
 .github/workflows/ci.yml       CI 门禁（Node 24，必需检查名 test）
-doc/                           变更规范、待办、发布检查单、每次变更的记录
+doc/README.md                  变更流程与测试规范
+doc/changes/                   每次变更一份记录（YYYY-MM-DD-HHMMSS-简短说明.md）
+doc/releases/                  每个版本一份发布说明（<version>.md）；GitHub Release 从它同步，别反过来
+doc/TODO.md                    待办与已删除功能的备查记录
+doc/发布前检查单.md             微信后台配置、上传提审、发版收尾顺序、真机自测清单
 ```
