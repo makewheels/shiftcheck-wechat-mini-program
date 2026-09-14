@@ -113,15 +113,51 @@ node --test test/*.test.js
 
 ## 本机验证的边界
 
-微信开发者工具装在 `/Applications/wechatwebdevtools.app`，但 **CLI 服务端口默认是关闭的**
-（工具 → 设置 → 安全设置 → 服务端口），所以 `cli` 的编译 / 预览 / 上传 / 自动化都用不了。
-因此：
-
 - 逻辑层验证靠 `node --test test/*.test.js`（排班算法、日历、结构、隐私卫生），本地与 CI 跑的是同一套
 - **界面层（渲染、换行、点击手感）测不了，必须人工在模拟器或真机看** —— 交付时要说清哪些没验过，
   不要把"测试通过"说成"界面没问题"
-- 想用命令行编译/上传，需要用户先开启服务端口并登录工具；开启后 `cli preview` / `cli upload` /
-  `cli auto`（配 `miniprogram-automator`）才可用，那时才谈得上真正的界面级 E2E
+- CI 里跑不了模拟器（开发者工具没有 Linux 版），所以「CI 绿」永远不等于「界面没问题」
+
+### 命令行上传（2026-09-14 实测跑通）
+
+前提：工具 → 设置 → 安全设置 → **服务端口开启**，且已登录。
+
+```bash
+cli islogin        # 返回 {"login":true} 才算登录着
+cli upload --project <仓库绝对路径> --version 2.4.0 --desc "本次改动摘要"
+```
+
+成功时长这样，`size` 是代码包体积：
+
+```
+✔ Using AppID: wx46b9f529e9244893
+- Upload
+│ TOTAL │ '260.9 KB' │ 267178 │
+✔ upload
+```
+
+**两个真踩过的坑，共同点是报错文案会把人引到错误方向：**
+
+1. **发网络请求的是 IDE 主进程，不是 CLI 进程。** `cli` 只是通过 `http://127.0.0.1:10182`
+   把活派给已经在跑的工具（输出里那句 `IDE server has started` 是"连上了"，不是"我启动了"）。
+   所以任何影响 TLS 的环境变量都必须在**启动工具的那个进程**上生效，
+   给跑 `cli` 的 shell 设是无效的。工具是常驻进程，改完环境变量必须**整个退出再启动**：
+   `cli quit` 之后要确认进程数归零，残留进程会继续占着 10182 端口应答，
+   让你以为重启过了其实还在用旧进程。
+
+2. **证书链验证失败会伪装成权限错误。** 症状链：
+   `requestProjectAttr` 失败 → 工具拿不到项目属性 → 进度条打出
+   `Fetching AppID () permissions`（**括号是空的，这是关键指纹**）→
+   拿着空 appid 去问权限 → 弹「**登录用户不是小程序开发者**」。
+   看到这句**先怀疑证书，别先去后台查成员权限**：appid 都没读到，权限校验问的是"空气"。
+   如果本机出网要经过会重签 TLS 证书的代理，工具的 Node 侧就会报
+   `UNABLE_TO_GET_ISSUER_CERT_LOCALLY`，修法是给**工具主进程**配 `NODE_EXTRA_CA_CERTS`
+   指向一份包含该根的 PEM（Electron 在 `ELECTRON_RUN_AS_NODE` 与 GUI 两种模式下都认这个变量，
+   已实测）。判据：翻工具日志里 `issuer certificate` 的条数，修好后应为 0。
+   日志目录在用户数据下的 `WeappLog\logs\`（Windows 是 `%LOCALAPPDATA%\微信开发者工具\User Data\<hash>\`）。
+   ⚠ 同一份日志里会**一半请求成功一半失败**：走 Electron `net` 的（扫码登录、`devsync` 等 CGI）
+   用系统证书库所以正常，走 Node `https` 的（上传、插件下载、基础库下载、`requestProjectAttr`）才失败。
+   别据此判断成"网络时好时坏"。
 
 ## 目录
 
