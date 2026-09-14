@@ -173,6 +173,36 @@ test('没有残留的合并冲突标记', function () {
   assert.deepStrictEqual(allHits(/^<{7}\s|^={7}$|^>{7}\s/), [], '有未解决的合并冲突标记')
 })
 
+/* ---------------- 文件体量 ---------------- */
+
+/**
+ * 单文件行数上限。
+ *
+ * 500 是留了余量的红线，不是照着现状卡出来的数：这一版最大的业务文件是
+ * pages/wbsd/worker/worker.js（352 行）。libs/ 下是第三方 SDK（打包版 LeanCloud
+ * 适配器就有 1246 行），不参与统计。
+ *
+ * 这条门禁拦的是「再往这个文件里塞一点」的惯性。8 个倒班页本来就高度雷同，
+ * 任何一个继续长下去，通常都说明该往 utils/ 或 components/ 里抽公共实现了
+ * （月日历就是这么抽出来的：utils/calendar.js + components/shift-calendar/）。
+ */
+const MAX_FILE_LINES = 500
+
+test('任何单个文件不超过 ' + MAX_FILE_LINES + ' 行（libs/ 第三方 SDK 除外）', function () {
+  const over = []
+  mp.walk(mp.REPO).forEach(function (f) {
+    const rel = relOf(f)
+    if (rel.startsWith('libs/')) return
+    if (!/\.(js|json|wxml|wxss|md)$/.test(rel)) return
+    const lines = fs.readFileSync(f, 'utf8').split('\n').length
+    if (lines > MAX_FILE_LINES) over.push(rel + '（' + lines + ' 行）')
+  })
+  over.sort()
+  assert.deepStrictEqual(over, [],
+    '这些文件超过 ' + MAX_FILE_LINES + ' 行，该拆了：倒班页的公共逻辑抽到 utils/ 或组件里，' +
+    '长文档拆成多篇放 doc/：\n' + over.join('\n'))
+})
+
 test('公开仓库里不许出现雇主/开发环境信息与第三方工具署名', function () {
   const banned = [
     ['雇主或企业网络环境', /施耐德|schneider|zscaler|\bMITM\b/i],
