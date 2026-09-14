@@ -238,19 +238,40 @@ test('hygiene-allow-line 豁免标记只许用在文档里，不许用来让代�
   })
 })
 
-test('app.js 的版本号与 README 更新日志里最新的版本一致', function () {
+function cmpVersion(a, b) {
+  const pa = a.split('.').map(Number)
+  const pb = b.split('.').map(Number)
+  return (pa[0] - pb[0]) || (pa[1] - pb[1]) || (pa[2] - pb[2])
+}
+
+test('app.js 的版本号等于 doc/releases/ 里最新的版本', function () {
+  // 更新日志 2026-09-14 起不在 README 里（README 只留指针），事实源是 doc/releases/。
+  // 这条门禁双向咬合：bump 了 appVersion 就必须有同版本的发布说明文件；
+  // 反过来新建了发布说明文件就必须 bump appVersion —— 必须同一次改动完成。
+  // 还没到发版时两者都不动，门禁自然绿。
   const appSrc = fs.readFileSync(path.join(mp.REPO, 'app.js'), 'utf8')
   const m = appSrc.match(/appVersion:\s*["'](\d+\.\d+\.\d+)["']/)
   assert.ok(m, 'app.js 里找不到 appVersion')
+  const files = fs.readdirSync(path.join(mp.REPO, 'doc', 'releases'))
+    .map(function (f) { const x = f.match(/^(\d+\.\d+\.\d+)\.md$/); return x && x[1] })
+    .filter(function (v) { return v })
+  assert.ok(files.length > 0, 'doc/releases/ 里一份发布说明都没有')
+  const latest = files.sort(cmpVersion).pop()
+  assert.strictEqual(m[1], latest,
+    'app.js 的 appVersion（' + m[1] + '）与 doc/releases/ 里最新版本（' + latest + '）不一致。\n' +
+    '要发新版：bump appVersion + 新建 doc/releases/<新版本>.md，同一次改动；\n' +
+    '还没到发版：两个都不要先动')
+})
+
+test('README 里不许再内联版本更新日志', function () {
+  // 2026-09-14 移除：与 doc/releases/ 内容重复，两处维护必然漂移
+  //（2.4.0 就出现过 README 比 tag 少 7 条，只能回头补 PR）。
+  // README 只留指针表格；2.3.0~2.3.4 的原文保留在 doc/releases/ 对应文件里，没有丢。
   const readme = fs.readFileSync(path.join(mp.REPO, 'README.md'), 'utf8')
-  const versions = [...readme.matchAll(/^##\s+(\d+\.\d+\.\d+)\s*$/gm)].map(function (x) { return x[1] })
-  assert.ok(versions.length > 0, 'README 里找不到版本更新日志条目')
-  const latest = versions.sort(function (a, b) {
-    const pa = a.split('.').map(Number)
-    const pb = b.split('.').map(Number)
-    return (pa[0] - pb[0]) || (pa[1] - pb[1]) || (pa[2] - pb[2])
-  }).pop()
-  assert.strictEqual(m[1], latest, 'app.js 的 appVersion 与 README 最新版本号不一致（发版要两边一起改）')
+  const inline = [...readme.matchAll(/^##\s+(\d+\.\d+\.\d+)\s*$/gm)].map(function (x) { return x[1] })
+  assert.deepStrictEqual(inline, [],
+    'README 里又出现内联的版本更新日志了：删掉它，去改 doc/releases/<版本>.md')
+  assert.ok(readme.includes('doc/releases/'), 'README 应该指向 doc/releases/')
 })
 
 test('当前版本必须有对应的发布说明 doc/releases/<version>.md', function () {

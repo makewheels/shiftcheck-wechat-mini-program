@@ -23,10 +23,14 @@
   GitHub Release 的正文用 `gh release create/edit --notes-file doc/releases/<version>.md` 从它同步过去。
   **不要在 GitHub 网页上直接写或改 Release 正文**，那样仓库里这份就过期了、两边会漂。
   约定与理由见 `doc/releases/README.md`
-- 顺序是：写 `doc/releases/X.Y.Z.md` + README 更新日志 → 改 `app.js` 的 `appVersion`
-  → CI 绿并合并 → 打 tag → 从文件同步 Release → 上传微信
-- `test/hygiene.test.js` 守三条：`app.js` 的 `appVersion` 必须等于 README 更新日志里最新的版本号；
-  `doc/releases/<appVersion>.md` 必须存在且不是空壳；发布说明里的链接必须指向 tag 而不是 `master`
+- 顺序是：写 `doc/releases/X.Y.Z.md` → 改 `app.js` 的 `appVersion`（**同一次改动**）
+  → CI 绿并合并 → 打 tag → 从文件同步 Release → 上传微信。
+  **还没到发版就两个都不要先动**（门禁会咬：appVersion 必须等于 `doc/releases/` 里最新版本）
+- **README 不写更新日志**（2026-09-14 起只留一张指针表格）：事实源是 `doc/releases/`，
+  两处维护必然漂移（2.4.0 就出现过 README 比 tag 少 7 条）
+- `test/hygiene.test.js` 守四条：`app.js` 的 `appVersion` 必须等于 `doc/releases/` 里最新的版本号；
+  README 里不许再内联版本更新日志；`doc/releases/<appVersion>.md` 必须存在且不是空壳；
+  发布说明里的链接必须指向 tag 而不是 `master`
   （Release 是版本快照，master 会一直往前走，指向 master 的链接将来会 404 或指向另一个版本的内容）
 
 ## 待办
