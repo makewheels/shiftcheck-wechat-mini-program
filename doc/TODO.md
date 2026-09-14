@@ -24,7 +24,7 @@
 - [x] 格子内容：日期 + 该天班次文字（与列表同一套算法）+ 节假日标记；上班/休息用底色区分
 - [x] 交互：页面内按钮切换；日历模式下翻页换成「上一月/下一月」；点某天回列表并从该天开始
 - [x] 公共实现：`utils/calendar.js` + `components/shift-calendar/`；页面只需实现 `getDayCell()`
-- [x] 接入范围：~~9 个倒班页（含 diy）~~ → **现在是 8 个**（diy 页在 2.5.0 随 DIY 链路删除）
+- [x] 接入范围：~~9 个倒班页（含 diy）~~ → **现在是 8 个**（diy 页在 2.4.0 随 DIY 链路删除）
 
 **遗留待办**：
 
@@ -42,7 +42,7 @@
 - [ ] **端到端验证待补**：要真跑一遍得先把新版本上传到微信后台。本机开发者工具 CLI 服务端口关闭，
   命令行编译/上传都用不了，「上传 → 检测到新版本 → 弹窗 → 重启」全链路尚未跑通
 
-## 4. 发布前必须在微信后台做的事（2.5.0 已按删除后的现状更新）
+## 4. 发布前必须在微信后台做的事（2.4.0 已按删除后的现状更新）
 
 代码改不动的部分都在 `doc/发布前检查单.md`：
 
@@ -67,8 +67,8 @@
 | 2.4.0 | `pages/setting/authUserInfo/` | 依赖的 `scope.userInfo` 授权微信 2021 年就停止下发，且它把「我的DIY规则」「订阅上班推送」两个入口挡死 |
 | 2.4.0 | `pages/setting/feedback/`、`pages/logs/` | 空占位页 / 模板默认页，都没有入口 |
 | 2.4.0 | `libs/mta_analysis.js`、`libs/av-weapp-min.js` | 死文件（MTA 2.3.3 就已停用；打包版 SDK 从未被 require） |
-| 2.5.0 | 推送链路 5 页：`pushHome`、`newPushMission`、`updateMail`、`updatePhone`、`accountHome` | 服务端定时任务随 `shiftcheck-server` 停用；`PushMission` 与 7 个推送字段全部只写不读；创建任务的入口自 2.2.x 起被裸 `return` 堵死 |
-| 2.5.0 | DIY 链路 4 页：`diy`、`diyPush`、`importRuleByKey`、`myRuleHome` | 全仓库零处创建 `Rule`/`RuleKey`，激活码对新用户 100% 报错且无处申请；导入页还会在登录未完成时烧毁一次性激活码并提示成功 |
+| 2.4.0 | 推送链路 5 页：`pushHome`、`newPushMission`、`updateMail`、`updatePhone`、`accountHome` | 服务端定时任务随 `shiftcheck-server` 停用；`PushMission` 与 7 个推送字段全部只写不读；创建任务的入口自 2.2.x 起被裸 `return` 堵死 |
+| 2.4.0 | DIY 链路 4 页：`diy`、`diyPush`、`importRuleByKey`、`myRuleHome` | 全仓库零处创建 `Rule`/`RuleKey`，激活码对新用户 100% 报错且无处申请；导入页还会在登录未完成时烧毁一次性激活码并提示成功 |
 
 LeanCloud 后台的 `WechatUser` / `PushMission` / `Rule` / `RuleKey` / `UserRule` 表**没有删**，
 数据还在，只是客户端不再读写。确认不需要后可自行清理。

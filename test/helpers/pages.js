@@ -5,7 +5,7 @@
  * 锚点必须与各页 getTotalDays() 里的常量一致 —— test/shift-pages.test.js 会断言这一点，
  * 所以改了代码里的锚点却没改这里，测试会红（这正是想要的：锚点改错会整页错班）。
  *
- * 注：原来还有第 9 个 pages/diy/diy.js（DIY 自定义规则），2.5.0 随整条 DIY 链路删除。
+ * 注：原来还有第 9 个 pages/diy/diy.js（DIY 自定义规则），2.4.0 随整条 DIY 链路删除。
  */
 
 const PAGES = [

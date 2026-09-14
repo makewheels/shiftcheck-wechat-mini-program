@@ -36,10 +36,6 @@ leancloud 改用专有域名 api.leancloud.mp.shiftcheck.work
 移除已失效的 scope.userInfo 授权门禁（原先把「我的DIY规则」和「订阅上班推送」挡死了）
 收紧 sitemap：只开放首页与 8 个倒班查询页给微信索引，含手机号 / 邮箱输入的页面不再可被搜到
 清理死代码：mta、失效的授权页、未使用的 LeanCloud 打包版 SDK、feedback 空占位页、logs 模板页、只写不读的 homepage 设置
-新增 test/ 测试套件（136 项，node:test 零依赖）与 GitHub Actions 门禁（已设为 master 必需检查）
-新增 AGENTS.md（仓库须知与陷阱清单）；变更记录文件名统一带时分秒
-
-## 2.5.0
 删除整条「上班推送」链路（pushHome / newPushMission / updateMail / updatePhone / accountHome）：
 创建任务的入口自 2.2.x 起就被一句裸 return 堵死，PushMission 表与 7 个推送字段全部只写不读，
 真正发信的定时任务在已停用的后端仓库里 —— 用户填了真实邮箱手机号也永远收不到
@@ -52,6 +48,8 @@ leancloud 改用专有域名 api.leancloud.mp.shiftcheck.work
 顺带消掉的问题：20 秒卡死的 loading toast（15 处全在已删页面里）、
 updateMail/updatePhone 的 users[0] 未判空崩溃、accountHome 的 save 竞态、
 pushHome 三个开关的乐观更新+静默失败、激活码被烧毁还提示成功
+新增 test/ 测试套件（131 项，node:test 零依赖）与 GitHub Actions 门禁（已设为 master 必需检查）
+新增 AGENTS.md（仓库须知与陷阱清单）；变更记录文件名统一带时分秒
 
 ## 变更规范
 
