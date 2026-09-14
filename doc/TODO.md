@@ -104,17 +104,32 @@ LeanCloud 后台的 `WechatUser` / `PushMission` / `Rule` / `RuleKey` / `UserRul
       `hygiene.test.js` 加门禁守着不许复活，`index-page.test.js` 加 5 条测试钉住"静默"这个性质
       （取不到 openid / undefined / 空串都不弹，取得到时照常上报，作者 openid 跳过）。
       详见 `doc/changes/2026-09-14-142621-fix-login-fail-modal.md`
-- [ ] **⚠ LeanCloud 专有域名疑似已全球失效，整条统计上报链路是死的**（2026-09-14 发现）：
-      `api.leancloud.mp.shiftcheck.work` 在本机 **DNS 解析失败**（`getaddrinfo failed`），
-      经代理 CONNECT 也是 `502 Bad Gateway`。对照测试排除了"本机 DNS 整类封个人域名"：
-      同一台机器上 `oneclick.video`、`secrets.a4.fit` 都能正常解析，
-      而 `shiftcheck.work` 的 apex 与 `mp` / `leancloud.mp` / `api.leancloud.mp` **三级子域全挂**。
-      **但本机所在网络的代理按类别封了 DoH 服务，所以无法从内网确认全球解析状态** —— 需要用手机流量或
-      另一台机器开一次 `https://api.leancloud.mp.shiftcheck.work` 才能定论。
-      如果确实死了，两件事要决定：① 使用统计还要不要（要就修 DNS / 换 LeanCloud 域名，
-      不要就把 `mystep2` + `UseMessage` 整条删掉）；② **`libs/` 里的 LeanCloud SDK 占 237.6 KB，
-      是 260.9 KB 上传包的 91%** —— 后端一旦确认弃用，删掉它包体能降到 ~25 KB
-      （注意 `app.js` 的 `getOpenid()` 也依赖 `AV.User.current()`，要一并处理）
+- [ ] **⚠ LeanCloud 专有域名已确认全球失效：`shiftcheck.work` 2026-08-09 到期未续费，现处
+      redemption period / pending delete**（2026-09-14 经 RDAP 查实，不再是"疑似"）。
+      RDAP 状态：`client transfer prohibited, pending delete, redemption period`；
+      注册 2025-08-09、到期 2026-08-09；权威 NS 已被换成注册商的过期停放服务器
+      （`expire1/expire2.cnolnic.com`）。所以 `api.leancloud.mp.shiftcheck.work`
+      对**全球所有用户**都解析不到 —— 不是本机网络问题，也不是代理问题。
+      影响面：只有首页使用统计上报依赖它；8 个倒班页与设置页全是本地计算，查班不受影响，
+      且上报失败现在是静默跳过的（本版修的），用户看不到任何异常。
+      **2.4.0 决定不处理**（console 里那行 `net::ERR_*` 只是噪音，对用户零影响），与域名决策一起放下一版。
+      两件事要决定：① **域名要不要赎回** —— 赎回期有时限，过期就彻底没了；
+      赎回后还要确认 LeanCloud 后台的自定义域名绑定是否仍然有效；
+      ② 若不赎回，把 `mystep2` + `UseMessage` + `app.js` 的 LeanCloud 初始化整条删掉 ——
+      **`libs/` 里的 SDK 占 237.6 KB，是 260.6 KB 上传包的 91%**，删掉包体能降到 ~25 KB
+      （注意 `app.js` 的 `getOpenid()` 依赖 `AV.User.current()`，要一并处理）
+- [ ] **月日历配色不够醒目**（2026-09-14 用户反馈，**下一版再做，不阻塞本次发版**）：
+      现在上/休靠底色区分（绿 / 粉），节假日只有一个小角标加一行小字，用户反馈"还是不明显"。
+      用户想要的方向：**普通日白色底，节假日用红色等强对比**，让"哪天放假"一眼看出来。
+      改的地方是 `components/shift-calendar/shift-calendar.wxss` 与 `.wxml` 的角标结构。
+      注意该组件是自定义组件、**样式隔离**：`app.wxss` 的全局样式进不去，组件内样式也出不来；
+      改完要在 8 个倒班页各截一张图对比（`cli auto` + `miniprogram-automator` 的
+      `screenshot()` 已能自动截图，验证方式见本次变更记录）
+- [ ] **评估要不要换现成的日历组件**（同上，下一版）：`components/shift-calendar/` 是自研的
+      （`utils/calendar.js` 出数据 + 组件渲染，2026-09-11 做的）。现成的通用日历组件不少，
+      但都要改造成"每格显示自定义班次文字 + 节假日标记"，改造成本未必低于自研；
+      自研的好处是班次算法通过 `calendar.onDate()` 原样复用、不存在第二套逻辑。
+      真要换先做对比再决定，别为了"用现成的"而用现成的
 - [ ] **首页使用统计的口径是错的**（不影响用户，只影响你自己的数据）：
       `index.js` 没有 `onShow` → **热启动一次都不上报**，只有冷启动上报；
       `app.js` 没有 `onShow` → `globalData.launchScene.scene` **永远是冷启动那次的场景值**，
