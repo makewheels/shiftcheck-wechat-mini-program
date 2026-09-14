@@ -19,17 +19,27 @@ const mp = require('./helpers/miniprogram.js')
 
 const SELF = path.join(__dirname, 'hygiene.test.js')
 
+/**
+ * 仓库相对路径，一律归一成正斜杠。
+ * Windows 上 mp.walk / mp.rel 给的是反斜杠，拿 '/libs/'、'/test/' 这类字面量去 includes
+ * 会一个都匹配不上，扫描范围就会悄悄多算 libs/ 与 test/（CI 跑在 Linux 上看不出来）。
+ */
+function relOf(f) {
+  return mp.rel(f).replace(/\\/g, '/')
+}
+
 function collect(filter) {
   return mp.walk(mp.REPO).filter(function (f) {
     if (f === SELF) return false
-    if (f.includes('/libs/')) return false // 第三方压缩库，内部有哈希形态字符串
-    if (f.includes('/.git/')) return false
-    return filter(f)
+    const rel = relOf(f)
+    if (rel.startsWith('libs/')) return false // 第三方压缩库，内部有哈希形态字符串
+    if (rel.startsWith('.git/')) return false
+    return filter(rel)
   })
 }
 
-const CODE = collect(function (f) { return /\.(js|json|wxml|wxss)$/.test(f) && !f.includes('/test/') })
-const ALL = collect(function (f) { return /\.(js|json|wxml|wxss|md)$/.test(f) })
+const CODE = collect(function (rel) { return /\.(js|json|wxml|wxss)$/.test(rel) && !rel.startsWith('test/') })
+const ALL = collect(function (rel) { return /\.(js|json|wxml|wxss|md)$/.test(rel) })
 
 function hitsIn(files, re, includeMarkedLines) {
   const out = []
@@ -41,7 +51,7 @@ function hitsIn(files, re, includeMarkedLines) {
       // 注意：检查「豁免标记本身有没有被滥用」时必须传 includeMarkedLines = true，
       // 否则那个检查会把自己要找的行也跳过，成为永远命中不了的死测试（这个坑真踩过）
       if (!includeMarkedLines && line.includes('hygiene-allow-line')) return
-      if (re.test(line)) out.push(mp.rel(f) + ':' + (i + 1) + '  ' + line.trim().slice(0, 90))
+      if (re.test(line)) out.push(relOf(f) + ':' + (i + 1) + '  ' + line.trim().slice(0, 90))
     })
   })
   return out

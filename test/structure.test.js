@@ -18,10 +18,25 @@ const mp = require('./helpers/miniprogram.js')
 const appJson = JSON.parse(fs.readFileSync(path.join(mp.REPO, 'app.json'), 'utf8'))
 const registered = new Set(appJson.pages)
 const allFiles = mp.walk(mp.REPO)
-const jsFiles = allFiles.filter(function (f) { return f.endsWith('.js') && !f.includes('/libs/') && !f.includes('/test/') })
+
+/**
+ * 仓库相对路径，一律归一成正斜杠。
+ * Windows 上 mp.walk / mp.rel 给的是反斜杠，拿 '/libs/'、'/pages/' 这类字面量去 includes
+ * 会一个都匹配不上：轻则把 libs/ 与 test/ 也算进扫描范围，重则整条门禁静默空跑
+ * （例如「磁盘上的页面目录都在 app.json 注册」会因为 dirs 恒为空而永远绿）。
+ * CI 跑在 Linux 上看不出这个差别，所以本地必须自己归一化。
+ */
+function relOf(f) {
+  return mp.rel(f).replace(/\\/g, '/')
+}
+
+const jsFiles = allFiles.filter(function (f) {
+  const rel = relOf(f)
+  return f.endsWith('.js') && !rel.startsWith('libs/') && !rel.startsWith('test/')
+})
 const wxmlFiles = allFiles.filter(function (f) { return f.endsWith('.wxml') })
 const jsonFiles = allFiles.filter(function (f) {
-  return f.endsWith('.json') && !f.endsWith('package.json') && !f.includes('/test/')
+  return f.endsWith('.json') && !f.endsWith('package.json') && !relOf(f).startsWith('test/')
 })
 
 test('app.json 注册的每个页面文件齐全且非空', function () {
@@ -51,7 +66,7 @@ test('磁盘上的页面目录都在 app.json 注册（不留进不去的死页�
   const dirs = new Set()
   allFiles.forEach(function (f) {
     if (!/\.(js|wxml)$/.test(f) || !f.includes('/pages/')) return
-    dirs.add(mp.rel(f).replace(/\.(js|wxml|json|wxss)$/, ''))
+    dirs.add(relOf(f).replace(/\.(js|wxml|json|wxss)$/, ''))
   })
   const unregistered = [...dirs].filter(function (d) { return !registered.has(d) })
   assert.deepStrictEqual(unregistered, [], '这些页面目录没在 app.json 注册：' + unregistered.join(', '))
@@ -69,9 +84,9 @@ test('代码里所有跳转目标都在 app.json 注册', function () {
       if (url.startsWith('/')) {
         url = url.slice(1)
       } else {
-        url = path.posix.normalize(path.posix.join(path.posix.dirname(mp.rel(f)), url)).replace(/^\.\//, '')
+        url = path.posix.normalize(path.posix.join(path.posix.dirname(relOf(f)), url)).replace(/^\.\//, '')
       }
-      if (!registered.has(url)) missing.push(mp.rel(f) + ' -> ' + url)
+      if (!registered.has(url)) missing.push(relOf(f) + ' -> ' + url)
     }
   })
   assert.deepStrictEqual(missing, [], '跳转目标未注册：' + missing.join('; '))
@@ -85,7 +100,7 @@ test('usingComponents 声明的组件文件齐全且标了 component:true', func
     try {
       j = JSON.parse(fs.readFileSync(f, 'utf8'))
     } catch (e) {
-      problems.push(mp.rel(f) + ' JSON 解析失败：' + e.message)
+      problems.push(relOf(f) + ' JSON 解析失败：' + e.message)
       return
     }
     const uc = j.usingComponents || {}
@@ -94,7 +109,7 @@ test('usingComponents 声明的组件文件齐全且标了 component:true', func
       const p = uc[name]
       const abs = p.startsWith('/') ? path.join(mp.REPO, p) : path.resolve(path.dirname(f), p)
       ;['js', 'json', 'wxml'].forEach(function (ext) {
-        if (!fs.existsSync(abs + '.' + ext)) problems.push(mp.rel(f) + ' 的组件 ' + name + ' 缺 .' + ext)
+        if (!fs.existsSync(abs + '.' + ext)) problems.push(relOf(f) + ' 的组件 ' + name + ' 缺 .' + ext)
       })
       if (fs.existsSync(abs + '.json')) {
         const cj = JSON.parse(fs.readFileSync(abs + '.json', 'utf8'))
@@ -117,7 +132,7 @@ test('wxml 里 bind/catch 绑定的处理函数在对应 js 中都存在', funct
     let m
     RE.lastIndex = 0
     while ((m = RE.exec(wsrc)) !== null) {
-      if (js.indexOf(m[1]) === -1) missing.push(mp.rel(w) + ' -> ' + m[1] + '()')
+      if (js.indexOf(m[1]) === -1) missing.push(relOf(w) + ' -> ' + m[1] + '()')
     }
   })
   assert.deepStrictEqual(missing, [], '这些事件处理函数在 js 里找不到：' + missing.join('; '))
@@ -161,7 +176,7 @@ test('「返回主页」类处理函数必须处理页面栈只有 1 层的深�
     if (!/close:\s*function\s*\(\)/.test(src)) return
     if (!/wx\.navigateBack/.test(src)) return
     if (!/getCurrentPages\(\)/.test(src)) {
-      problems.push(mp.rel(f) + ' 的 close() 调了 navigateBack 却没判页面栈深度')
+      problems.push(relOf(f) + ' 的 close() 调了 navigateBack 却没判页面栈深度')
     }
   })
   assert.deepStrictEqual(problems, [],
@@ -179,6 +194,6 @@ test('project.config.json 用的是正式 appid，不是游客 appid', function 
 
 test('所有 json 都能解析', function () {
   jsonFiles.forEach(function (f) {
-    assert.doesNotThrow(function () { JSON.parse(fs.readFileSync(f, 'utf8')) }, mp.rel(f) + ' 解析失败')
+    assert.doesNotThrow(function () { JSON.parse(fs.readFileSync(f, 'utf8')) }, relOf(f) + ' 解析失败')
   })
 })
