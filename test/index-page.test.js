@@ -84,3 +84,68 @@ test('首页 data 里不该再留 lastTimestamp（它是假节流的根源）', 
   assert.match(src, /getStorageSync\(['"]lastReportTimestamp['"]\)/, '节流必须读 storage')
   assert.match(src, /setStorageSync\(['"]lastReportTimestamp['"]/, '节流必须写 storage')
 })
+
+/* ---------------- 统计上报不许打扰用户 ---------------- */
+
+/**
+ * 这一组守的是 2.4.0 的发布级 bug：使用统计上报原先走"取不到 openid 就补登录、
+ * 补不上就弹阻塞式 showModal"的路径。而首页 8 个倒班入口全是纯本地计算、根本不需要登录，
+ * 于是用户只想查今天上什么班，却因为一个后台统计请求失败被模态框拦住 ——
+ * 网络不通或后端域名失效时，每个用户一打开首页必中。
+ *
+ * 修法是让上报走静默路径。这几条测试钉住"静默"这个性质：
+ * 既不许弹框，也不许把上报功能本身修没了。
+ */
+
+// 直接调 mystep2（onLoad 里是 setTimeout 800ms 后才调，同步测试等不到）
+function report(appOverrides) {
+  const apiLog = []
+  const calls = []
+  const page = mp.load('pages/index/index.js', null, {
+    storage: {}, calls: calls, apiLog: apiLog, app: appOverrides
+  })
+  page.mystep2(String(Date.now()), { networkType: 'wifi' })
+  return { apiLog: apiLog, calls: calls }
+}
+
+function popups(apiLog) {
+  return apiLog.filter(function (x) {
+    return x.name === 'showModal' || x.name === 'showToast' || x.name === 'hideToast'
+  })
+}
+
+test('取不到 openid 时静默跳过，一个提示都不许弹（这条在旧实现下必红）', function () {
+  const r = report({ getOpenid: function () { return null } })
+  assert.deepStrictEqual(popups(r.apiLog), [],
+    '统计上报是纯后台行为，失败不该打扰用户。旧实现会在这里弹阻塞式 showModal')
+  assert.ok(!r.calls.includes('getScreenBrightness'),
+    '没有 openid 就该直接 return，不要继续走上报流程')
+})
+
+test('openid 是 undefined / 空串时同样静默', function () {
+  ;[undefined, ''].forEach(function (bad) {
+    const r = report({ getOpenid: function () { return bad } })
+    assert.deepStrictEqual(popups(r.apiLog), [], 'openid = ' + JSON.stringify(bad) + ' 时不该弹提示')
+    assert.ok(!r.calls.includes('getScreenBrightness'), 'openid = ' + JSON.stringify(bad) + ' 时不该上报')
+  })
+})
+
+test('取得到 openid 时照常上报（别把功能一起修没了）', function () {
+  const r = report(null)
+  assert.ok(r.calls.includes('getScreenBrightness'), '应继续走上报流程：取屏幕亮度')
+  assert.ok(r.calls.includes('getSystemInfo'), '应继续走上报流程：取系统信息')
+  assert.deepStrictEqual(popups(r.apiLog), [], '正常上报路径也不该弹任何提示')
+})
+
+test('作者自己的 openid 跳过上报，且同样不弹提示', function () {
+  const r = report({ getOpenid: function () { return 'o9K4b0QW0Yz2wosJeEIIk7QJo8Cg' } })
+  assert.ok(!r.calls.includes('getScreenBrightness'), '作者自己不该被计入统计')
+  assert.deepStrictEqual(popups(r.apiLog), [], '跳过时也不该弹提示')
+})
+
+test('app.js 里不该再有"补登录失败就弹框"的方法', function () {
+  const src = require('fs').readFileSync(require('path').join(mp.REPO, 'app.js'), 'utf8')
+  assert.ok(!/withOpenid\s*:\s*function/.test(src), 'withOpenid 已删除，别加回来')
+  assert.ok(!/loginFailTip\s*:\s*function/.test(src), 'loginFailTip 已删除，别加回来')
+  assert.match(src, /getOpenid\s*:\s*function/, 'getOpenid 要留着：同步、拿不到返回 null')
+})
