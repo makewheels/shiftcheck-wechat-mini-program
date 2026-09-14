@@ -25,13 +25,13 @@
 | --- | --- |
 | 本机直接解析 | `gaierror [Errno 11001] getaddrinfo failed` |
 | 经代理 CONNECT | `HTTP/1.0 502 Bad Gateway` |
-| 对照：`oneclick.video`、`secrets.a4.fit` | 均正常解析（→ 不是公司 DNS 整类封个人域名） |
+| 对照：`oneclick.video`、`secrets.a4.fit` | 均正常解析（→ 不是本机 DNS 整类封个人域名） |
 | 对照：`shiftcheck.work` 的 `mp` / `leancloud.mp` / `api.leancloud.mp` | 三级子域**全挂** |
 
 `project.private.config.json` 里 `urlCheck = false`（覆盖 `project.config.json` 的 `true`），
 所以模拟器里域名白名单校验是关掉的 —— **这不是白名单问题，是域名解析不了**。
 
-⚠ 但公司网络按类别封了 DoH 服务（`dns.google` / `cloudflare-dns.com` 都返回
+⚠ 但本机所在网络按类别封了 DoH 服务（`dns.google` / `cloudflare-dns.com` 都返回
 「Not allowed to browse DoH Services category」），**无法从内网确认全球解析状态**。
 需要用手机流量或另一台机器验一次才能定论。已记入 `doc/TODO.md` 第 6 节。
 

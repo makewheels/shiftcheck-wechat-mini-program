@@ -19,8 +19,15 @@
 ## 发版
 
 - 每个版本都要**打 annotated tag + 建 GitHub Release**，顺序与命令见 `doc/发布前检查单.md` 第 8 节
-- 顺序是：README 更新日志写全 → 改 `app.js` 的 `appVersion` → CI 绿并合并 → 打 tag → 建 Release → 上传微信
-- 版本号一致性由 `test/hygiene.test.js` 守着（`app.js` 的 `appVersion` 必须等于 README 更新日志里最新的版本号）
+- **发布说明以仓库文件为唯一事实源**：每个版本一份 `doc/releases/<version>.md`，
+  GitHub Release 的正文用 `gh release create/edit --notes-file doc/releases/<version>.md` 从它同步过去。
+  **不要在 GitHub 网页上直接写或改 Release 正文**，那样仓库里这份就过期了、两边会漂。
+  约定与理由见 `doc/releases/README.md`
+- 顺序是：写 `doc/releases/X.Y.Z.md` + README 更新日志 → 改 `app.js` 的 `appVersion`
+  → CI 绿并合并 → 打 tag → 从文件同步 Release → 上传微信
+- `test/hygiene.test.js` 守三条：`app.js` 的 `appVersion` 必须等于 README 更新日志里最新的版本号；
+  `doc/releases/<appVersion>.md` 必须存在且不是空壳；发布说明里的链接必须指向 tag 而不是 `master`
+  （Release 是版本快照，master 会一直往前走，指向 master 的链接将来会 404 或指向另一个版本的内容）
 
 ## 待办
 
@@ -39,7 +46,8 @@
   - `calendar.test.js` 月历网格几何与交互（换月收敛、点日期回列表、`onDate` 还原）
   - `shift-pages.test.js` **最要紧**：锚点守卫、周期性不变量、经警队实测班表、金标准快照、列表 == 日历
   - `structure.test.js` 页面注册 / 跳转目标 / 组件声明 / wxml 事件处理函数是否齐全
-  - `hygiene.test.js` 已废弃 API、隐私接口位置、硬编码凭据、死代码复活、版本号与 README 一致
+  - `hygiene.test.js` 已废弃 API、隐私接口位置、硬编码凭据、死代码复活、单文件行数上限、
+    版本号与 README 一致、发布说明文件存在且链接指向 tag、变更记录文件名规范
 - `test/fixtures/golden-rows.json` 是金标准快照，锁定各页已校准的班次输出。
   **只有真实班表被重新校准后**才该更新它：`GOLDEN_UPDATE=1 node --test test/shift-pages.test.js`
 - 改排班相关代码：动手前跑一遍、改完再跑一遍。想知道测试是不是真能挡住问题，
@@ -60,6 +68,9 @@
   + `components/shift-calendar/`（自定义组件，样式隔离）
   + `utils/holiday.js`（内置法定节假日，数据来自国务院办公厅通知，**每年 11 月下一年安排公布后要手工补**）。
   倒班页只需实现一个 `getDayCell(year, month, day)`；班次算法通过 `calendar.onDate()` 原样复用，不存在第二套逻辑。
-- **取 openid 一律用 `app.getOpenid()`（同步、可能为 null）或 `app.withOpenid(cb)`（未登录先补登录）**，
+- **取 openid 一律用 `app.getOpenid()`**（同步、可能为 `null`），拿不到就由调用方自己静默跳过。
   不要再写 `AV.User.current().toJSON()`：冷启动首次登录还没回来时那样会直接崩页。
+  **后台行为失败不许弹框打扰用户** —— `app.js` 里曾经有一对「取不到 openid 就补登录、
+  补不上就弹阻塞式 `showModal`」的方法，唯一调用方是首页的使用统计上报，
+  结果用户只想查今天上什么班却被模态框拦住。已整对删除，`hygiene.test.js` 有门禁守着不许复活。
 - 发布前要在微信后台做的事（域名白名单、隐私保护指引、广告位、上传提审）见 `doc/发布前检查单.md`。
