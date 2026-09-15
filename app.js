@@ -1,13 +1,3 @@
-const AV = require('./libs/av-core-min.js');
-const adapters = require('./libs/leancloud-adapters-weapp.js');
-
-AV.setAdapters(adapters);
-AV.init({
-  appId: 'WgCaIMjje5tVez7TD63Wfain-gzGzoHsz',
-  appKey: 'RghzMpMGmyv5zyDVoecjyS4T',
-  serverURLs: 'https://api.leancloud.mp.shiftcheck.work'
-});
-
 App({
   globalData: {
     //小程序版本号
@@ -16,30 +6,19 @@ App({
   },
 
   /**
-   * 当前登录用户的 openid，还没登录上时返回 null
-   * 页面里不要再直接写 AV.User.current().toJSON()，冷启动首次登录还没回来时那样会崩
-   */
-  getOpenid: function() {
-    var user = AV.User.current()
-    if (!user) {
-      return null
-    }
-    var json = user.toJSON()
-    var authData = json && json.authData && json.authData.lc_weapp
-    return authData ? authData.openid : null
-  },
-
-  /**
-   * 这里曾经有一对「拿不到 openid 就补登录、补不上就弹阻塞式模态框」的方法，已删除，别加回来。
+   * LeanCloud 集成已于 2.5.0 整条删除：libs/ 两个文件、AV 初始化、登录、使用统计上报一起删。
    *
-   * 全仓库没有任何功能真的需要登录态：8 个倒班页与设置页都是纯本地计算，
-   * 那对方法唯一的调用方是首页的使用统计上报（纯后台行为）。结果是用户只想查今天上什么班，
-   * 却因为一个统计请求失败被模态框拦住 —— 网络不通或后端域名失效时，每个用户一打开首页必中。
+   * 原因：专有域名 shiftcheck.work 2026-08-09 到期未续费、现处赎回期 / 待删除，
+   * api.leancloud.mp.shiftcheck.work 对**全球所有用户**都解析不到 —— 统计对所有人早已是死的，
+   * 只剩下每次启动 3 个注定失败的请求（登录 + 2 次重试）和 console 里的报错。
+   * 用户 2026-09-14 拍板：删集成、不赎回域名。
    *
-   * hygiene.test.js 有门禁守着不许复活；来龙去脉见 AGENTS.md「改页面时」与
-   * doc/changes/ 里 2026-09-14 的那条记录。
+   * **别加回来。** 若将来真要使用统计：先解决后端与域名（或换方案），见 doc/TODO.md；
+   * hygiene.test.js 有门禁守着不许再引入 AV / LeanCloud。
    *
-   * 要 openid 就用上面的 getOpenid()：同步、拿不到返回 null，由调用方自己决定静默跳过。
+   * 8 个倒班页与设置页全是纯本地计算、不需要登录态，删除后功能零损失。
+   * 更早的历史：2.4.0 曾修过「统计上报失败弹阻塞式模态框挡住用户」的发布级事故
+   * （见 doc/changes/2026-09-14-142621-fix-login-fail-modal.md），本次是把整条链路连根删掉。
    */
 
   /**
@@ -84,29 +63,10 @@ App({
     })
   },
 
-  /**
-   * leancloud 登录，失败后重试
-   */
-  login: function(retryLeft) {
-    var that = this
-    var left = retryLeft === undefined ? 2 : retryLeft
-    AV.User.loginWithMiniApp().then(function(user) {
-      that.globalData.user = user
-    }, function() {
-      if (left > 0) {
-        setTimeout(function() {
-          that.login(left - 1)
-        }, 2000)
-      }
-    })
-  },
-
   onLaunch: function (launchScene) {
     this.globalData.launchScene = launchScene
 
-    //升级检查要尽早注册，放在登录之前
+    //升级检查要尽早注册
     this.initUpdateManager()
-    //leancloud登录
-    this.login()
   }
 })
