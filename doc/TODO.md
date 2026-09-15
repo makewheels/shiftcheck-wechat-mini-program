@@ -46,18 +46,18 @@
   再上传一个更高版本才能真跑一遍。现在只验到"开发版本已生成"，`initUpdateManager()` 的三个回调
   在真机上是否按预期触发仍未证实
 
-## 4. 发布前必须在微信后台做的事（2.4.0 已按删除后的现状更新）
+## 4. 发布前必须在微信后台做的事（2.5.0 已按删除后的现状更新）
 
 代码改不动的部分都在 `doc/发布前检查单.md`：
 
-- [ ] **request 合法域名**：全仓库只剩 `api.leancloud.mp.shiftcheck.work` 一个（只有首页使用统计上报在用）
-- [ ] **用户隐私保护指引**：**已没有必须声明的隐私接口**（剪贴板随激活码导入页删除、
-      邮箱手机号随推送链路删除、从来没有定位）。仍建议如实说明会收集设备信息与 openid 用于使用统计
+- [ ] **request 合法域名**：已**无需配置** —— LeanCloud 统计删除后全仓库零网络请求，
+      后台白名单里残留的 `api.leancloud.mp.shiftcheck.work` 可移除
+- [ ] **用户隐私保护指引**：**已没有必须声明的隐私接口，也不再收集任何信息**
+      （剪贴板随激活码导入页删除、邮箱手机号随推送链路删除、
+      设备信息与 openid 的使用统计随 LeanCloud 集成删除、从来没有定位）
 - [ ] **广告位只剩 1 个**：`adunit-499feca899514736`（banner，11 个页面在用；首页那处是注释掉的）。
       确认它属于本小程序主体且已开通流量主
 - [ ] **作废两个已泄露的 ip138 token**（`12ff…8129`、`2da1…b1b72`）：代码里已删，但公开仓库的 git 历史里还在
-- [ ] **LeanCloud 后台配 ACL**：小程序端 appKey 天生公开（包可反编译），不配 ACL 的话
-      任何人都能往 `UseMessage` 灌垃圾数据
 - [ ] **基础库版本统一**：`project.config.json` 是 2.8.2、`project.private.config.json` 是 2.25.3
       （开发者工具曾自动把后者改成 3.17.3，说明本机有 3.17.3 可用）
 - [ ] **GitHub Support 工单**：8 个旧 commit 仍可按 SHA 访问（其中 2 个的文件树里有开发环境描述、
@@ -74,9 +74,10 @@
 | 2.4.0 | `libs/mta_analysis.js`、`libs/av-weapp-min.js` | 死文件（MTA 2.3.3 就已停用；打包版 SDK 从未被 require） |
 | 2.4.0 | 推送链路 5 页：`pushHome`、`newPushMission`、`updateMail`、`updatePhone`、`accountHome` | 服务端定时任务随 `shiftcheck-server` 停用；`PushMission` 与 7 个推送字段全部只写不读；创建任务的入口自 2.2.x 起被裸 `return` 堵死 |
 | 2.4.0 | DIY 链路 4 页：`diy`、`diyPush`、`importRuleByKey`、`myRuleHome` | 全仓库零处创建 `Rule`/`RuleKey`，激活码对新用户 100% 报错且无处申请；导入页还会在登录未完成时烧毁一次性激活码并提示成功 |
+| 2.5.0 | LeanCloud 集成整条链路：`libs/` 两个 SDK（237.6 KB）、`app.js` 的 AV 初始化 / 登录 / `getOpenid()`、首页 `mystep2()` 使用统计上报 | 专有域名 `shiftcheck.work` 2026-08-09 到期未续费、全球解析不到（RDAP 查实），统计对所有人早已是死的；SDK 占 260.6 KB 上传包的 91%，删除后 ~25 KB。决策：不赎回域名 |
 
 LeanCloud 后台的 `WechatUser` / `PushMission` / `Rule` / `RuleKey` / `UserRule` 表**没有删**，
-数据还在，只是客户端不再读写。确认不需要后可自行清理。
+数据还在。客户端自 2.5.0 起与 LeanCloud 零依赖（不读也不写），确认不需要后可自行清理。
 
 ## 6. 已知遗留（本轮明确"先记着、之后再修"，都不阻塞发布）
 
@@ -104,20 +105,13 @@ LeanCloud 后台的 `WechatUser` / `PushMission` / `Rule` / `RuleKey` / `UserRul
       `hygiene.test.js` 加门禁守着不许复活，`index-page.test.js` 加 5 条测试钉住"静默"这个性质
       （取不到 openid / undefined / 空串都不弹，取得到时照常上报，作者 openid 跳过）。
       详见 `doc/changes/2026-09-14-142621-fix-login-fail-modal.md`
-- [ ] **⚠ LeanCloud 专有域名已确认全球失效：`shiftcheck.work` 2026-08-09 到期未续费，现处
-      redemption period / pending delete**（2026-09-14 经 RDAP 查实，不再是"疑似"）。
-      RDAP 状态：`client transfer prohibited, pending delete, redemption period`；
-      注册 2025-08-09、到期 2026-08-09；权威 NS 已被换成注册商的过期停放服务器
-      （`expire1/expire2.cnolnic.com`）。所以 `api.leancloud.mp.shiftcheck.work`
-      对**全球所有用户**都解析不到 —— 不是本机网络问题，也不是代理问题。
-      影响面：只有首页使用统计上报依赖它；8 个倒班页与设置页全是本地计算，查班不受影响，
-      且上报失败现在是静默跳过的（本版修的），用户看不到任何异常。
-      **2.4.0 决定不处理**（console 里那行 `net::ERR_*` 只是噪音，对用户零影响），与域名决策一起放下一版。
-      两件事要决定：① **域名要不要赎回** —— 赎回期有时限，过期就彻底没了；
-      赎回后还要确认 LeanCloud 后台的自定义域名绑定是否仍然有效；
-      ② 若不赎回，把 `mystep2` + `UseMessage` + `app.js` 的 LeanCloud 初始化整条删掉 ——
-      **`libs/` 里的 SDK 占 237.6 KB，是 260.6 KB 上传包的 91%**，删掉包体能降到 ~25 KB
-      （注意 `app.js` 的 `getOpenid()` 依赖 `AV.User.current()`，要一并处理）
+- [x] ~~**⚠ LeanCloud 专有域名全球失效**~~ —— **2026-09-15 已处理**：决策**不赎回域名**，
+      集成整条删除（删除清单见上面第 5 节的表，决策依据与证据链见
+      `doc/changes/2026-09-15-185733-remove-leancloud.md`）。
+      原条目记录的事实：`shiftcheck.work` 2026-08-09 到期未续费（RDAP 查实：
+      `client transfer prohibited, pending delete, redemption period`，权威 NS 被换成
+      注册商过期停放服务器），`api.leancloud.mp.shiftcheck.work` 对全球所有用户解析不到，
+      统计早已是死的 —— 不是本机网络问题，也不是代理问题
 - [ ] **月日历配色不够醒目**（2026-09-14 用户反馈，**下一版再做，不阻塞本次发版**）：
       现在上/休靠底色区分（绿 / 粉），节假日只有一个小角标加一行小字，用户反馈"还是不明显"。
       用户想要的方向：**普通日白色底，节假日用红色等强对比**，让"哪天放假"一眼看出来。
@@ -130,21 +124,15 @@ LeanCloud 后台的 `WechatUser` / `PushMission` / `Rule` / `RuleKey` / `UserRul
       但都要改造成"每格显示自定义班次文字 + 节假日标记"，改造成本未必低于自研；
       自研的好处是班次算法通过 `calendar.onDate()` 原样复用、不存在第二套逻辑。
       真要换先做对比再决定，别为了"用现成的"而用现成的
-- [ ] **首页使用统计的口径是错的**（不影响用户，只影响你自己的数据）：
-      `index.js` 没有 `onShow` → **热启动一次都不上报**，只有冷启动上报；
-      `app.js` 没有 `onShow` → `globalData.launchScene.scene` **永远是冷启动那次的场景值**，
-      用户换个入口进来不会更新。2.4.0 已修好「5 分钟节流」（原来存在页面 data 里，恒不生效）
 - [ ] **五班三倒总览的「一值/二值/三值」与个人页「后夜(零点)/白班/前夜」的对应关系需要作者确认**：
       逐 remainder 验算过两页在数学上完全一致（一值↔后夜、二值↔白班、三值↔前夜），
       但这个映射在业务语义上看着别扭（通常顺序是白班→前夜→后夜）。是否符合现场真实叫法只有作者知道
-- [ ] `index.js` 里跳过自身上报的 openid 是硬编码的（作者自己的 openid），保留未动；
-      介意它出现在公开仓库里的话可以改成从 LeanCloud 配置读
 - [ ] 以后若真需要用户头像昵称，用官方的「头像昵称填写能力」
       （`open-type="chooseAvatar"` + `input type="nickname"`），不要再回到 `wx.getUserInfo` / `getUserProfile`
 - [ ] 若哪天要重做推送，用微信官方的**订阅消息**（`wx.requestSubscribeMessage` + 服务端下发），
       比自建邮件/短信链路省事，也不用收集邮箱手机号
-- [ ] 若哪天要重做自定义规则，规则的创建与发码要放在 LeanCloud 云引擎里做，
-      不要依赖客户端写入（appKey 公开，任何人都能改 `RuleKey.state`）
+- [ ] 若哪天要重做自定义规则，规则的创建与发码要放在服务端做，
+      不要依赖客户端写入（客户端凭据天生公开，任何人都能改 `RuleKey.state`）
 
 ### 2.4.0 发版收尾时记下的（2026-09-14）
 

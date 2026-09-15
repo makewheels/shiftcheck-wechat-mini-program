@@ -4,9 +4,10 @@
 
 ## 这是什么项目
 
-微信小程序「查班神器」：倒班/排班查询。原生小程序（**无框架、无构建步骤、无 npm 依赖**），
-后端是 LeanCloud（`libs/av-core-min.js` + `libs/leancloud-adapters-weapp.js`，专有域名 `api.leancloud.mp.shiftcheck.work`）。
-appid `wx46b9f529e9244893`。全部功能在小程序端，`doc/README.md` 里提到的 shiftcheck-server 后端仓库已不再使用。
+微信小程序「查班神器」：倒班/排班查询。原生小程序（**无框架、无构建步骤、无 npm 依赖、无后端**），
+11 个页面全是纯本地计算、断网也能查班。appid `wx46b9f529e9244893`。
+`doc/README.md` 里提到的 shiftcheck-server 后端仓库已不再使用；LeanCloud 集成（使用统计上报）
+已于 2.5.0 整条删除，原因与证据见 `doc/TODO.md` 第 5 节。
 
 ## 跑测试
 
@@ -18,12 +19,13 @@ node --test test/*.test.js
   （仓库里出现 `package.json` 会让微信开发者工具的「构建 npm」介入，没必要添这个变量）
 - 需要 Node 18+。**注意 `node --test test/`（给目录）在部分版本会被当成模块路径而报错，
   要写通配 `test/*.test.js`**
-- 测试是纯 Node 的：用假的 `Page()` / `Component()` / `wx` / `getApp()` / LeanCloud SDK
+- 测试是纯 Node 的：用假的 `Page()` / `Component()` / `wx` / `getApp()`
   沙箱加载页面 js 后直接调方法断言，**不启动模拟器**。加载器在 `test/helpers/miniprogram.js`
-- 六个测试文件：`shift`（日期与取模）、`holiday`（节假日数据自检）、`calendar`（月历几何与交互）、
+- 八个测试文件：`shift`（日期与取模）、`holiday`（节假日数据自检）、`calendar`（月历几何与交互）、
   **`shift-pages`（最要紧：锚点守卫、周期性不变量、经警队实测班表、金标准快照、列表==日历）**、
-  `structure`（页面注册/跳转目标/组件/wxml 处理函数齐全性）、`hygiene`（废弃 API、隐私接口位置、
-  硬编码凭据、死代码复活、单文件行数上限、版本号与 README 一致、发布说明文件存在且链接指向 tag、
+  `structure`（页面注册/跳转目标/组件/wxml 处理函数齐全性）、`back-home`（深链进入时「返回主页」）、
+  `index-page`（首页是纯入口页：不发请求、不弹框）、`hygiene`（废弃 API、隐私接口、硬编码凭据、
+  死代码复活、LeanCloud 不许回来、单文件行数上限、版本号与 README 一致、发布说明文件存在且链接指向 tag、
   变更记录文件名规范）
 - `test/fixtures/golden-rows.json` 是金标准快照，锁定各页已校准的班次输出。
   **只有真实班表被重新校准后**才该更新：`GOLDEN_UPDATE=1 node --test test/shift-pages.test.js`
@@ -80,15 +82,15 @@ node --test test/*.test.js
 
 ## 改页面时
 
-- 取 openid **只能**用 `app.getOpenid()`（同步、未登录返回 `null`），拿不到就由调用方自己静默跳过。
-  **不要**写 `AV.User.current().toJSON()`：未登录时 `current()` 是 `null`，
-  直接 `.toJSON()` 就 TypeError 白屏。这个坑踩过两次（README 2.3.3 记过一次，2.4.0 又统一收了 21 处）
+- openid / 登录态：全仓库**没有任何功能需要**。LeanCloud 集成（含 `app.getOpenid()`、登录、
+  首页统计上报）已随 2.5.0 整条删除，`hygiene.test.js` 有门禁守着不许回来。
+  历史坑备忘：`AV.User.current()` 未登录时是 `null`，直接 `.toJSON()` 就 TypeError 白屏，
+  踩过两次（2.3.3 一次，2.4.0 又统一收了 21 处）
 - **后台行为失败不许弹框打扰用户。** `app.js` 里曾经有一对「取不到 openid 就补登录、
   补不上就弹阻塞式 `showModal`」的方法，唯一调用方是首页的使用统计上报 ——
   而首页 8 个倒班入口全是本地计算、根本不需要登录。结果网络不通或后端域名失效时，
-  每个用户一打开首页就被拦一下。已整对删除，`hygiene.test.js` 有门禁守着不许复活。
+  每个用户一打开首页就被拦一下。2.5.0 连同统计上报一起整条删除，`hygiene.test.js` 有门禁守着不许复活。
   判断标准很简单：**这个调用失败了，用户会在意吗？** 不会就静默 return，别弹任何东西
-- 查询结果取 `[0]` 前先判空（LeanCloud 查不到就是空数组）
 - 新增倒班页要接月日历的话：`data` 加 `viewMode`/`cal`，实现一个 `getDayCell(year, month, day)`，
   加 4 个一行转发方法（`toggleView`/`backMonth`/`nextMonth`/`onCalendarDayTap`），
   `setText()` 末尾加 `calendar.refresh(this)`，`.json` 注册 `shift-calendar` 组件。
@@ -116,8 +118,8 @@ node --test test/*.test.js
   邮箱手机号随推送链路删除、从来没有定位）。这意味着后台《用户隐私保护指引》没有必须声明的接口项 ——
   这是个很值钱的性质，`hygiene.test.js` 用**零容忍**门禁守着：剪贴板 / 定位 / 收货地址一出现就红。
   要加任何隐私接口之前，先想清楚是不是真的需要，并且同步更新后台声明与 `doc/发布前检查单.md`
-- 现在只有首页的使用统计上报还连 LeanCloud（`pages/index/index.js` 的 `mystep2()`）；
-  **8 个倒班页与设置页都是纯本地计算，断网也能查班** —— 不要让它们开始依赖网络或登录态
+- 全仓库**不发任何网络请求、不依赖登录态** —— 11 个页面全是纯本地计算，断网也能查班
+  （LeanCloud 统计上报已随 2.5.0 删除）。不要让任何页面开始依赖网络或登录态
 - 不要把任何 token / key / secret 写进代码。历史上硬编码过两个 ip138 token，随公开仓库泄露，只能作废重置
 - 已废弃 API 不要再用：`wx.getSystemInfoSync`（用 `wx.getSystemInfo`）、`wx.getUserInfo`、`wx.getUserProfile`
   （都只返回匿名数据）。要头像昵称用官方的"头像昵称填写能力"：
@@ -181,7 +183,6 @@ components/shift-calendar/     月日历自定义组件
 utils/shift.js                 日期与取模（有符号天数差、负数取模）
 utils/calendar.js              月日历渲染数据与交互
 utils/holiday.js               内置法定节假日数据（每年 11 月要手工补下一年）
-libs/                          LeanCloud SDK（第三方，不要改）
 test/                          node:test 测试套件 + 沙箱加载器 + 金标准 fixture
 .github/workflows/ci.yml       CI 门禁（Node 24，必需检查名 test）
 doc/README.md                  变更流程与测试规范

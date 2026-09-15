@@ -13,46 +13,8 @@ const path = require('path')
 
 const REPO = path.resolve(__dirname, '..', '..')
 
-// LeanCloud SDK 替身：测试不连后端
-// extend() 要返回一个"像样"的构造器：页面里会 new 出来再 .save()，
-// 而且这些调用常常发生在 setTimeout 里（测试结束之后），桩不完整就会抛出未捕获异常
-const AV_STUB = {
-  Object: {
-    extend: function () {
-      return function (attrs) {
-        Object.assign(this, attrs || {})
-        this.save = function () { return Promise.resolve(this) }
-        this.set = function () {}
-        this.get = function () { return undefined }
-        this.destroy = function () { return Promise.resolve(this) }
-      }
-    },
-    createWithoutData: function () {
-      return {
-        set: function () {},
-        save: function () { return Promise.resolve({}) },
-        destroy: function () { return Promise.resolve({}) }
-      }
-    }
-  },
-  Query: function () {
-    return {
-      equalTo: function () { return this },
-      find: function () { return Promise.resolve([]) }
-    }
-  },
-  User: {
-    current: function () { return null },
-    loginWithMiniApp: function () { return Promise.resolve({}) }
-  },
-  File: function () {
-    return { save: function () { return Promise.resolve({ url: function () { return '' } }) } }
-  },
-  Cloud: { run: function () { return Promise.resolve({}) } },
-  init: function () {},
-  setAdapters: function () {}
-}
-
+// LeanCloud SDK 替身已于 2.5.0 删除：集成整条移除后没有页面再 require libs/，
+// 桩留着只会让人误以为还有后端依赖。makeRequire 里对应的分支也一起删了。
 const UPDATE_MANAGER = {
   onCheckForUpdate: function () {},
   onUpdateReady: function () {},
@@ -94,19 +56,17 @@ function makeWxStub(storage, calls, apiLog) {
 // 不带 storage 的默认替身（绝大多数测试用这个）
 const WX_STUB = makeWxStub(null)
 
-// getApp() 替身：页面里会用到 globalData 与 openid 相关方法
-// 注：这里曾经还替身了 withOpenid / loginFailTip —— 那两个方法已从 app.js 删除
-//（"取不到 openid 就弹框挡住用户"，是 2.4.0 的发布级 bug），hygiene.test.js 有门禁守着不许复活
+// getApp() 替身：页面里只会用到 globalData
+// 注：这里曾经替身过 getOpenid / withOpenid / loginFailTip —— 都随 LeanCloud 集成删除了
+//（"取不到 openid 就弹框挡住用户"是 2.4.0 的发布级 bug），hygiene.test.js 有门禁守着不许复活
 function appStub(overrides) {
   return Object.assign({
-    globalData: { appVersion: 'test', launchScene: { scene: 0 } },
-    getOpenid: function () { return 'test-openid' }
+    globalData: { appVersion: 'test', launchScene: { scene: 0 } }
   }, overrides || {})
 }
 
 function makeRequire(fromFile) {
   return function (id) {
-    if (/av-core-min|leancloud-adapters/.test(id)) return AV_STUB
     if (id.charAt(0) === '.') return require(path.resolve(path.dirname(fromFile), id))
     return require(id)
   }
@@ -119,8 +79,7 @@ function loadConfig(file, opts) {
   const code = fs.readFileSync(file, 'utf8')
   // opts.pageStack 控制 getCurrentPages() 返回的页面栈，用来测深链场景（栈深只有 1）
   const pageStack = (opts && opts.pageStack) || [{}, {}]
-  // opts.app 传对象时覆盖 getApp() 的默认替身，用来测「取不到 openid」这类分支
-  //（默认替身总是返回一个 openid，所以那条分支不加这个口子根本测不到）
+  // opts.app 传对象时覆盖 getApp() 的默认替身（换 globalData / 补方法都用它）
   const getAppImpl = (opts && opts.app)
     ? function () { return appStub(opts.app) }
     : appStub
@@ -187,7 +146,6 @@ function rel(file) {
 
 module.exports = {
   REPO: REPO,
-  AV_STUB: AV_STUB,
   WX_STUB: WX_STUB,
   makeWxStub: makeWxStub,
   appStub: appStub,
