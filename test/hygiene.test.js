@@ -3,7 +3,7 @@
  * 代码卫生门禁
  *
  * 这里的每一条都对应一次真实踩过的坑，写成测试是为了不让它再回来：
- *   - AV.User.current().toJSON()：未登录时 current() 是 null，直接 .toJSON() 白屏（历史上 21 处）
+ *   - LeanCloud 集成 2.5.0 整条删除：域名失效、统计早已是死的，AV / libs 不许再回来
  *   - Math.abs() 取天数差 / 裸 % 取模：锚点日之前的日期会算错班
  *   - 静默读剪贴板、查 IP、硬编码 token：隐私接口未声明会被拦，token 随公开仓库泄露
  *   - 已废弃 API：wx.getSystemInfoSync / wx.getUserInfo / wx.getUserProfile
@@ -32,7 +32,7 @@ function collect(filter) {
   return mp.walk(mp.REPO).filter(function (f) {
     if (f === SELF) return false
     const rel = relOf(f)
-    if (rel.startsWith('libs/')) return false // 第三方压缩库，内部有哈希形态字符串
+    if (rel.startsWith('libs/')) return false // 防御性：将来若再放第三方压缩库，内部哈希形态字符串会误中凭据扫描
     if (rel.startsWith('.git/')) return false
     return filter(rel)
   })
@@ -60,18 +60,26 @@ function hitsIn(files, re, includeMarkedLines) {
 const codeHits = function (re) { return hitsIn(CODE, re) }
 const allHits = function (re) { return hitsIn(ALL, re) }
 
-/* ---------------- 登录与 openid ---------------- */
+/* ---------------- LeanCloud（已整条删除，不许回来） ---------------- */
 
-test('页面里不许直接写 AV.User.current().toJSON()（未登录会崩）', function () {
-  const bad = codeHits(/AV\.User\.current\(\)\s*\.\s*toJSON\(\)/).filter(function (h) {
-    return !h.startsWith('app.js')
-  })
-  assert.deepStrictEqual(bad, [], '改用 app.getOpenid() / app.withOpenid(cb)：\n' + bad.join('\n'))
+test('不许再引入 LeanCloud / AV（集成已随 2.5.0 整条删除）', function () {
+  // 专有域名 shiftcheck.work 2026-08-09 到期未续费、全球解析不到，统计对所有人
+  // 早已是死的，只剩每次启动 3 个注定失败的请求。集成、SDK、登录链路已连根删掉
+  // （含 app.js 的 getOpenid / login 与首页 mystep2 上报）。
+  // 代码文件里描述这段历史的注释不拦（如 app.js 文件头），但调用不许回来。
+  // 旧坑备忘：AV.User.current() 未登录时是 null，直接 .toJSON() 白屏，历史上踩过两次。
+  const avCalls = codeHits(/\bAV\.\w/)
+  assert.deepStrictEqual(avCalls, [], 'AV 调用不许回来：\n' + avCalls.join('\n'))
+  const libsReq = codeHits(/require\(\s*['"][^'"]*libs\//)
+  assert.deepStrictEqual(libsReq, [], '不许 require libs/（SDK 已删除）：\n' + libsReq.join('\n'))
+  assert.ok(!fs.existsSync(path.join(mp.REPO, 'libs/av-core-min.js')), 'LeanCloud 核心库已删除，别加回来')
+  assert.ok(!fs.existsSync(path.join(mp.REPO, 'libs/leancloud-adapters-weapp.js')),
+    'LeanCloud 小程序适配器已删除，别加回来')
 })
 
-test('app.js 必须提供登录与升级相关方法，且升级回调注册方式正确', function () {
+test('app.js 必须提供升级相关方法，且升级回调注册方式正确', function () {
   const src = fs.readFileSync(path.join(mp.REPO, 'app.js'), 'utf8')
-  ;['getOpenid', 'initUpdateManager', 'login'].forEach(function (fn) {
+  ;['initUpdateManager', 'onLaunch'].forEach(function (fn) {
     assert.match(src, new RegExp(fn + '\\s*:\\s*function'), 'app.js 缺少 ' + fn + '()')
   })
   assert.match(src, /onCheckForUpdate\(/)
@@ -162,14 +170,15 @@ test('已删除的死代码不许回来', function () {
 
 test('「取不到 openid 就弹框挡住用户」那套不许复活', function () {
   // app.js 里曾经有一对方法：拿不到 openid 就补登录，补不上就弹阻塞式 showModal。
-  // 全仓库没有任何功能真的需要登录态 —— 8 个倒班页与设置页都是纯本地计算，
-  // 那对方法唯一的调用方是首页的使用统计上报（纯后台行为）。
+  // 它们唯一的调用方是首页的使用统计上报（纯后台行为），而 8 个倒班页与设置页都是
+  // 纯本地计算 —— 全仓库从来没有功能真的需要登录态。
   // 后果是发布级事故：用户只想查今天上什么班，却因为一个统计请求失败被模态框拦住，
   // 网络不通或后端域名失效时每个用户一打开首页必中（2.4.0 真实发生过）。
+  // 2.5.0 起统计上报连同 LeanCloud 集成整条删除，这对方法也一起没了。
   // 这条门禁守的是"机制"而不是"文案"：换个提示措辞也应该被拦下。
   assert.deepStrictEqual(codeHits(/\bwithOpenid\b|\bloginFailTip\b/), [],
-    '不要恢复这两个方法。要 openid 用 app.getOpenid()（同步，拿不到返回 null），' +
-    '由调用方自己静默跳过 —— 后台行为失败不该打扰用户')
+    '不要恢复这两个方法。全仓库已没有任何功能需要 openid / 登录态，' +
+    '后台行为失败更不该打扰用户')
 })
 
 /* ---------------- 仓库卫生 ---------------- */
@@ -191,8 +200,8 @@ test('没有残留的合并冲突标记', function () {
  * 单文件行数上限。
  *
  * 500 是留了余量的红线，不是照着现状卡出来的数：这一版最大的业务文件是
- * pages/wbsd/worker/worker.js（352 行）。libs/ 下是第三方 SDK（打包版 LeanCloud
- * 适配器就有 1246 行），不参与统计。
+ * pages/wbsd/worker/worker.js（352 行）。libs/ 的排除是防御性的 —— LeanCloud
+ * 适配器（1246 行）已随集成删除，但将来若真要引入第三方库，也不该被这条红线卡。
  *
  * 这条门禁拦的是「再往这个文件里塞一点」的惯性。8 个倒班页本来就高度雷同，
  * 任何一个继续长下去，通常都说明该往 utils/ 或 components/ 里抽公共实现了
