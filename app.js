@@ -1,7 +1,7 @@
 App({
   globalData: {
     //小程序版本号
-    appVersion: "2.4.0",
+    appVersion: "2.5.0",
     launchScene: {}
   },
 
