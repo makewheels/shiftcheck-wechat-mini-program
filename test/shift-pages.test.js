@@ -312,3 +312,27 @@ pg.PAGES.forEach(function (meta) {
       '点日历 9/20 后 r1 应是 9/20 的班次')
   })
 })
+
+/* ---------------- 6. 跳转到指定日期 ---------------- */
+
+// 8 个倒班页的 bindDateChange 逐字一致（从五班三倒页抄的），
+// 这里钉住行为：picker 给的是 1 基月份，页面存 0 基要减 1，且列表从跳转日重算
+pg.PAGES.forEach(function (meta) {
+  test('日期跳转：' + meta.name + ' 跳到 2026-10-01', function () {
+    const page = mp.load(meta.rel, pg.extraDataFor(meta))
+    const firstSetter = pg.banzuSetters(page)[0]
+    if (firstSetter) page[firstSetter]()
+    page.bindDateChange({ detail: { value: '2026-10-01' } })
+    assert.strictEqual(page.data.year, 2026)
+    assert.strictEqual(page.data.month, 9, 'picker 的 value 是 1 基月份，页面 data 是 0 基，要减 1')
+    assert.strictEqual(page.data.day, 1)
+
+    // 列表第一行应等于「直接把日期设成 10/1」的第一行（不允许第二套算法）
+    const fresh = mp.load(meta.rel, pg.extraDataFor(meta))
+    const freshSetter = pg.banzuSetters(fresh)[0]
+    if (freshSetter) fresh[freshSetter]()
+    atDate(fresh, 2026, 9, 1)
+    assert.strictEqual(pg.stripDate(page.data.r1), pg.stripDate(fresh.data.r1),
+      '跳转后 r1 应是 10/1 的班次')
+  })
+})

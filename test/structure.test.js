@@ -102,6 +102,17 @@ test('每个页面 json 都有 navigationBarTitleText（多级页面才分得出
     '这些页面缺 navigationBarTitleText，标题栏会退回全局的「查班神器」：' + missing.join(', '))
 })
 
+test('8 个倒班页都有「跳转到指定日期」（picker + bindDateChange）', function () {
+  const shiftPages = appJson.pages.filter(function (p) { return /\/(worker|director)\//.test(p) })
+  assert.strictEqual(shiftPages.length, 8, '倒班页应是 8 个，实际 ' + shiftPages.length)
+  const missing = []
+  shiftPages.forEach(function (p) {
+    const wsrc = fs.readFileSync(path.join(mp.REPO, p + '.wxml'), 'utf8')
+    if (wsrc.indexOf('<picker mode="date" bindchange="bindDateChange">') === -1) missing.push(p + '.wxml')
+  })
+  assert.deepStrictEqual(missing, [], '这些倒班页缺「跳转到指定日期」：' + missing.join(', '))
+})
+
 test('usingComponents 声明的组件文件齐全且标了 component:true', function () {
   const problems = []
   let checked = 0

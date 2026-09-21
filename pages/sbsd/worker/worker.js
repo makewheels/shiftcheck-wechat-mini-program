@@ -268,6 +268,25 @@ Page({
   },
 
   /**
+   * 日期选择
+   */
+  bindDateChange: function(e) {
+    var dateArr = e.detail.value.split("-")
+    var year = parseInt(dateArr[0])
+    var month = parseInt(dateArr[1])
+    var day = parseInt(dateArr[2])
+    this.setData({
+      year: year,
+      month: month - 1,
+      day: day
+    })
+    this.setText()
+    wx.showToast({
+      title: year + "-" + month + "-" + day
+    })
+  },
+
+  /**
    * 月日历里一格的内容
    */
   getDayCell: function(year, month, day) {

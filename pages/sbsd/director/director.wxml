@@ -13,6 +13,9 @@
     <text>{{r7}}</text>
   </block>
   <shift-calendar wx:else cal="{{cal}}" bind:daytap="onCalendarDayTap"></shift-calendar>
+  <picker mode="date" bindchange="bindDateChange">
+    <button>跳转到指定日期</button>
+  </picker>
   <block wx:if="{{viewMode === 'list'}}">
     <view class="flex-wrap">
       <button bindtap="backDay">前 一 天</button>
