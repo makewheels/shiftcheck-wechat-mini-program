@@ -1,84 +1,76 @@
 var share = require('../../../utils/share.js')
 
+/**
+ * 四种倒班的「个人模式默认班组」设置。
+ * 每个个人页 onLoad 读自己的 storage key（存 1~N 的班组号），列表见 MODES。
+ * 没设置过时各页有兜底默认：五班三倒是三班（历史如此，别改），
+ * 经警队 / 四班四倒 / 三班半倒是一班（接上设置前的行为）。
+ */
+var MODES = [
+  {
+    key: 'setting-wbsdDefault',
+    name: '五班三倒',
+    banzus: ['一班', '二班', '三班', '四班', '五班'],
+    fallback: '三班'
+  },
+  {
+    key: 'setting-jjdDefault',
+    name: '经警队',
+    banzus: ['一班', '二班', '三班', '四班'],
+    fallback: '一班'
+  },
+  {
+    key: 'setting-sbsdDefault',
+    name: '四班四倒',
+    banzus: ['一班', '二班', '三班', '四班'],
+    fallback: '一班'
+  },
+  {
+    key: 'setting-sbbdDefault',
+    name: '三班半倒',
+    banzus: ['一班', '二班', '三班'],
+    fallback: '一班'
+  }
+]
+
+//读 storage 拼出渲染用的行；存了越界/垃圾值按未设置处理
+function readModes() {
+  return MODES.map(function (mode) {
+    var saved = parseInt(wx.getStorageSync(mode.key), 10)
+    var current = saved >= 1 && saved <= mode.banzus.length
+      ? mode.banzus[saved - 1]
+      : '未设置（默认' + mode.fallback + '）'
+    return { name: mode.name, current: current }
+  })
+}
+
 Page({
   data: {
-    wbsdCurrent: "loading..."
+    modes: []
   },
 
   //先加载已保存的设置中的内容
   onLoad: function () {
     share.setup(wx)
-    var wbsdSaved = wx.getStorageSync('setting-wbsdDefault')
-    if (wbsdSaved == undefined) {
-      this.setData({
-        wbsdCurrent: "未设置"
-      })
-      return
-    }
-    if (wbsdSaved == 1) {
-      this.setData({
-        wbsdCurrent: "一班"
-      })
-    } else if (wbsdSaved == 2) {
-      this.setData({
-        wbsdCurrent: "二班"
-      })
-    } else if (wbsdSaved == 3) {
-      this.setData({
-        wbsdCurrent: "三班"
-      })
-    } else if (wbsdSaved == 4) {
-      this.setData({
-        wbsdCurrent: "四班"
-      })
-    } else if (wbsdSaved == 5) {
-      this.setData({
-        wbsdCurrent: "五班"
-      })
-    } else {
-      this.setData({
-        wbsdCurrent: "未设置"
-      })
-    }
+    this.setData({
+      modes: readModes()
+    })
   },
 
-  //点击修改五班三倒按钮
-  wbsd: function () {
+  //点击某一种倒班的「修改默认班组」按钮
+  changeBanzu: function (e) {
     var that = this
+    var index = e.currentTarget.dataset.index
+    var mode = MODES[index]
     wx.showActionSheet({
-      itemList: ['一班', '二班', '三班', '四班', '五班'],
+      itemList: mode.banzus,
       success: function (res) {
-        var index = res.tapIndex
-        wx.setStorageSync('setting-wbsdDefault', index + 1)
-        var banzuStr = ""
-        if (index == 0) {
-          banzuStr = "一班"
-          that.setData({
-            wbsdCurrent: "一班"
-          })
-        } else if (index == 1) {
-          banzuStr = "二班"
-          that.setData({
-            wbsdCurrent: "二班"
-          })
-        } else if (index == 2) {
-          banzuStr = "三班"
-          that.setData({
-            wbsdCurrent: "三班"
-          })
-        } else if (index == 3) {
-          banzuStr = "四班"
-          that.setData({
-            wbsdCurrent: "四班"
-          })
-        } else {
-          banzuStr = "五班"
-          that.setData({
-            wbsdCurrent: "五班"
-          })
-        }
+        wx.setStorageSync(mode.key, res.tapIndex + 1)
+        that.setData({
+          modes: readModes()
+        })
         wx.showToast({
-          title: '已设为' + banzuStr + "!"
+          title: mode.name + '默认班组已设为' + mode.banzus[res.tapIndex] + '!'
         })
       }
     })

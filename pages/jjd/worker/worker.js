@@ -33,8 +33,13 @@ Page({
 
   onLoad: function() {
     share.setup(wx)
-    //初始化班组
-    this.setBanzu1()
+    //初始化班组：读设置里保存的默认班组，没设置过（或存的值不合法）就默认一班
+    var saved = parseInt(wx.getStorageSync('setting-jjdDefault'), 10)
+    if (saved >= 1 && saved <= 4) {
+      this['setBanzu' + saved]()
+    } else {
+      this.setBanzu1()
+    }
     //初始化时间
     var date = new Date()
     this.setData({
