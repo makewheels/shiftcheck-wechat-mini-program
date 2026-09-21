@@ -125,6 +125,17 @@ test('wxml 里不许用 HTML 标签（span/div 等，开发者工具会告警）
   assert.deepStrictEqual(bad, [], 'wxml 只认自己的标签（view/text/image/...）：' + bad.join(', '))
 })
 
+// 这个门禁的由来：转发 PR（#55）给两个设置页写的 require 相对路径少了一层，
+// 真机上页面直接打不开；但当时没有任何测试在沙箱里加载过这两个页面，CI 全绿就合进去了。
+// 页面顶层 require 路径错这类问题，只要「真的加载一次」就藏不住。
+test('每个注册页面都能在沙箱里加载（require 路径错误当场红）', function () {
+  appJson.pages.forEach(function (p) {
+    assert.doesNotThrow(function () {
+      mp.load(p + '.js')
+    }, p + ' 在沙箱里加载失败（多半是 require 路径或顶层代码有问题）')
+  })
+})
+
 test('usingComponents 声明的组件文件齐全且标了 component:true', function () {
   const problems = []
   let checked = 0
