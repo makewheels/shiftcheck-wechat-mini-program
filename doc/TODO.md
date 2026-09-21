@@ -83,10 +83,13 @@ LeanCloud 后台的 `WechatUser` / `PushMission` / `Rule` / `RuleKey` / `UserRul
 
 按性价比排序：
 
-- [ ] **转发功能全死**：11 个页面都调了 `wx.showShareMenu()`，但**0 个页面实现 `onShareAppMessage`** ——
-      按微信规则右上角根本不会出现「转发」。`README.md` 2.3.0 写的「给每个页面添加转发按钮」不成立。
-      修法很便宜：写一个 `utils/share.js` 导出统一的 `onShareAppMessage`，11 个页面各加一行；
-      顺便给 `showShareMenu` 传 `menus: ['shareAppMessage','shareTimeline']` 打开朋友圈
+- [x] ~~**转发功能全死**~~ —— **2026-09-21 已修**：新增 `utils/share.js`（统一的卡片标题、
+      当前页直达 path、`setup()` 带 `menus` 同时打开「转发」与「分享到朋友圈」），
+      11 个页面全部接上 `onShareAppMessage` / `onShareTimeline`，`share.test.js` 钉住接线与
+      标题对应。见 `doc/changes/2026-09-21-141530-share.md`。
+      原条目记录的事实：此前 11 个页面都调了 `wx.showShareMenu()`，
+      但 0 个页面实现 `onShareAppMessage`，按微信规则右上角根本不会出现「转发」；
+      `README.md` 2.3.0 写的「给每个页面添加转发按钮」不成立
 - [x] ~~**11 个页面都没有 `navigationBarTitleText`**~~ —— **2026-09-21 已补**：每个页面 json 加了自己的标题
       （倒班页「xx · 个人/总览」、设置页「设置」、默认班组页「默认班组」，首页保持「查班神器」），
       `structure.test.js` 有门禁守着新页面必须带标题。

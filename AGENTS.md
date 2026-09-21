@@ -21,10 +21,11 @@ node --test test/*.test.js
   要写通配 `test/*.test.js`**
 - 测试是纯 Node 的：用假的 `Page()` / `Component()` / `wx` / `getApp()`
   沙箱加载页面 js 后直接调方法断言，**不启动模拟器**。加载器在 `test/helpers/miniprogram.js`
-- 八个测试文件：`shift`（日期与取模）、`holiday`（节假日数据自检）、`calendar`（月历几何与交互）、
+- 九个测试文件：`shift`（日期与取模）、`holiday`（节假日数据自检）、`calendar`（月历几何与交互）、
   **`shift-pages`（最要紧：锚点守卫、周期性不变量、经警队实测班表、金标准快照、列表==日历）**、
   `structure`（页面注册/跳转目标/组件/wxml 处理函数齐全性）、`back-home`（深链进入时「返回主页」）、
-  `index-page`（首页是纯入口页：不发请求、不弹框）、`hygiene`（废弃 API、隐私接口、硬编码凭据、
+  `index-page`（首页是纯入口页：不发请求、不弹框）、`share`（转发接线、卡片标题与页面标题对应）、
+  `hygiene`（废弃 API、隐私接口、硬编码凭据、
   死代码复活、LeanCloud 不许回来、单文件行数上限、版本号与 README 一致、发布说明文件存在且链接指向 tag、
   变更记录文件名规范）
 - `test/fixtures/golden-rows.json` 是金标准快照，锁定各页已校准的班次输出。
@@ -91,6 +92,11 @@ node --test test/*.test.js
   而首页 8 个倒班入口全是本地计算、根本不需要登录。结果网络不通或后端域名失效时，
   每个用户一打开首页就被拦一下。2.5.0 连同统计上报一起整条删除，`hygiene.test.js` 有门禁守着不许复活。
   判断标准很简单：**这个调用失败了，用户会在意吗？** 不会就静默 return，别弹任何东西
+- 新增页面要接转发：`require` `utils/share.js`、`onLoad` 里调 `share.setup()`
+  （别直接调 `wx.showShareMenu()`，那样 `menus` 参数会丢、朋友圈入口出不来）、
+  Page 配置加 `onShareAppMessage: share.appMessage, onShareTimeline: share.timeline`，
+  再往 `share.js` 的 `TITLES` 加一条（与页面 json 的 `navigationBarTitleText` 对应）。
+  `share.test.js` 会钉住接线与标题对应，漏一处就红
 - 新增倒班页要接月日历的话：`data` 加 `viewMode`/`cal`，实现一个 `getDayCell(year, month, day)`，
   加 4 个一行转发方法（`toggleView`/`backMonth`/`nextMonth`/`onCalendarDayTap`），
   `setText()` 末尾加 `calendar.refresh(this)`，`.json` 注册 `shift-calendar` 组件。
@@ -183,6 +189,7 @@ components/shift-calendar/     月日历自定义组件
 utils/shift.js                 日期与取模（有符号天数差、负数取模）
 utils/calendar.js              月日历渲染数据与交互
 utils/holiday.js               内置法定节假日数据（每年 11 月要手工补下一年）
+utils/share.js                 转发 / 分享到朋友圈的公共实现（11 个页面共用）
 test/                          node:test 测试套件 + 沙箱加载器 + 金标准 fixture
 .github/workflows/ci.yml       CI 门禁（Node 24，必需检查名 test）
 doc/README.md                  变更流程与测试规范

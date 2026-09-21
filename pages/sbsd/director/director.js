@@ -1,5 +1,6 @@
 var shift = require('../../../utils/shift.js')
 var calendar = require('../../../utils/calendar.js')
+var share = require('../../../utils/share.js')
 
 Page({
 
@@ -28,7 +29,7 @@ Page({
   },
 
   onLoad: function() {
-    wx.showShareMenu()
+    share.setup(wx)
     var date = new Date()
     this.setData({
       year: date.getFullYear(),
@@ -266,5 +267,9 @@ Page({
    */
   onCalendarDayTap: function(e) {
     calendar.dayTap(this, e.detail)
-  }
+  },
+
+  //转发给朋友 / 分享到朋友圈
+  onShareAppMessage: share.appMessage,
+  onShareTimeline: share.timeline,
 })

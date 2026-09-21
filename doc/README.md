@@ -44,12 +44,15 @@
 - 测试是纯 Node 的：用假的 `Page()` / `Component()` / `wx` / `getApp()` 沙箱加载页面 js 后直接调方法断言，
   **不启动模拟器**（也因此能在 GitHub Actions 的 Linux runner 上跑 —— 微信开发者工具没有 Linux 版）。
   沙箱在 `test/helpers/miniprogram.js`
-- 六个测试文件的分工：
+- 九个测试文件的分工：
   - `shift.test.js` 日期与取模（负数取模是「锚点之前不算错班」的关键）
   - `holiday.test.js` 节假日数据自检（天数、补班日必为周末、官方通知日期抽查）
   - `calendar.test.js` 月历网格几何与交互（换月收敛、点日期回列表、`onDate` 还原）
   - `shift-pages.test.js` **最要紧**：锚点守卫、周期性不变量、经警队实测班表、金标准快照、列表 == 日历
   - `structure.test.js` 页面注册 / 跳转目标 / 组件声明 / wxml 事件处理函数是否齐全
+  - `back-home.test.js` 深链进入（分享卡片 / 搜一搜）时页面栈只有 1 层，「返回主页」仍可用
+  - `index-page.test.js` 首页是纯入口页：不发请求、不弹框（LeanCloud 链路不许回来）
+  - `share.test.js` 转发接线齐全、转发卡片标题与页面标题一一对应
   - `hygiene.test.js` 已废弃 API、隐私接口位置、硬编码凭据、死代码复活、单文件行数上限、
     版本号与 README 一致、发布说明文件存在且链接指向 tag、变更记录文件名规范
 - `test/fixtures/golden-rows.json` 是金标准快照，锁定各页已校准的班次输出。
