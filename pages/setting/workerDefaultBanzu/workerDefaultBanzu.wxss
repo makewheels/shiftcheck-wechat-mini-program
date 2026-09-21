@@ -2,13 +2,13 @@
   padding-top: 5rpx;
 }
 
-.flex-wrap {
-  display: -webkit-flex;
-}
-
 #title {
   font-size: 60rpx;
   margin-bottom: 30rpx;
+}
+
+.mode-block {
+  margin-bottom: 20rpx;
 }
 
 button {
@@ -24,6 +24,8 @@ button {
   font-size: 50rpx;
 }
 
+/* 原来整页只有一组设置，用 500rpx 把广告推到屏幕下方；
+   现在有四组，页面本身够长，广告跟在内容后面即可 */
 .ad-banner {
-  margin-top: 500rpx;
+  margin-top: 60rpx;
 }

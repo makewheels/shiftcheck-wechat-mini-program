@@ -27,7 +27,9 @@ const UPDATE_MANAGER = {
 // 用来测「跨页面实例共享 storage」的行为（例如首页的上报节流）
 // calls 传一个数组时，会记下页面访问过哪些 wx API，用来断言某条分支有没有走到
 // apiLog 传一个数组时，会记下 no-op API 的调用名与参数（例如 reLaunch 的 url）
-function makeWxStub(storage, calls, apiLog) {
+// actionSheetTap 控制 showActionSheet 的成功回调选中第几项（默认第 0 项），
+// 用来测「设置页选班组」这类动作表交互
+function makeWxStub(storage, calls, apiLog, actionSheetTap) {
   return new Proxy({}, {
     get: function (_target, prop) {
       if (calls && typeof prop === 'string') calls.push(prop)
@@ -46,6 +48,9 @@ function makeWxStub(storage, calls, apiLog) {
       if (prop === 'getSystemInfoSync') return function () { return {} }
       if (prop === 'getUpdateManager') return function () { return UPDATE_MANAGER }
       if (prop === 'canIUse') return function () { return true }
+      if (prop === 'showActionSheet') {
+        return function (o) { if (o && o.success) o.success({ tapIndex: actionSheetTap || 0 }) }
+      }
       return function (arg) {
         if (apiLog && typeof prop === 'string') apiLog.push({ name: prop, arg: arg })
       }
@@ -88,7 +93,8 @@ function loadConfig(file, opts) {
     'module', 'exports', '__dirname',
     code
   )(capture, capture, capture, makeRequire(file),
-    makeWxStub(opts && opts.storage, opts && opts.calls, opts && opts.apiLog), getAppImpl,
+    makeWxStub(opts && opts.storage, opts && opts.calls, opts && opts.apiLog,
+      opts && opts.actionSheetTap), getAppImpl,
     function () { return pageStack }, { exports: {} }, {}, path.dirname(file))
   if (!config) throw new Error('没能从 ' + file + ' 取到配置对象')
   return config
@@ -122,7 +128,7 @@ function instantiate(config, extraData) {
   return inst
 }
 
-/** 按仓库相对路径加载页面 / 组件实例；opts.storage 传对象可模拟跨实例共享的本地存储 */
+/** 按仓库相对路径加载页面 / 组件实例；opts.storage 模拟本地存储、opts.actionSheetTap 控制 showActionSheet 选中的项 */
 function load(relPath, extraData, opts) {
   return instantiate(loadConfig(path.join(REPO, relPath), opts), extraData)
 }

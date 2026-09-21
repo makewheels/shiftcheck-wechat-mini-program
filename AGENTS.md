@@ -21,10 +21,11 @@ node --test test/*.test.js
   要写通配 `test/*.test.js`**
 - 测试是纯 Node 的：用假的 `Page()` / `Component()` / `wx` / `getApp()`
   沙箱加载页面 js 后直接调方法断言，**不启动模拟器**。加载器在 `test/helpers/miniprogram.js`
-- 九个测试文件：`shift`（日期与取模）、`holiday`（节假日数据自检）、`calendar`（月历几何与交互）、
+- 十个测试文件：`shift`（日期与取模）、`holiday`（节假日数据自检）、`calendar`（月历几何与交互）、
   **`shift-pages`（最要紧：锚点守卫、周期性不变量、经警队实测班表、金标准快照、列表==日历）**、
-  `structure`（页面注册/跳转目标/组件/wxml 处理函数齐全性）、`back-home`（深链进入时「返回主页」）、
+  `structure`（页面注册/跳转目标/组件/wxml 处理函数齐全性、每页沙箱可加载）、`back-home`（深链进入时「返回主页」）、
   `index-page`（首页是纯入口页：不发请求、不弹框）、`share`（转发接线、卡片标题与页面标题对应）、
+  `default-banzu`（默认班组：设置页与 4 个个人页的读写契约）、
   `hygiene`（废弃 API、隐私接口、硬编码凭据、
   死代码复活、LeanCloud 不许回来、单文件行数上限、版本号与 README 一致、发布说明文件存在且链接指向 tag、
   变更记录文件名规范）

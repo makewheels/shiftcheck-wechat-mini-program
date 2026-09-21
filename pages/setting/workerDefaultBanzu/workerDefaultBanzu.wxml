@@ -1,7 +1,9 @@
 <view class="container">
   <text id="title">个人模式默认班组</text>
-  <text class="currentBanzu">五班三倒：{{wbsdCurrent}}</text>
-  <button bindtap="wbsd" type="default">修改默认班组</button>
+  <view class="mode-block" wx:for="{{modes}}" wx:key="name">
+    <text class="currentBanzu">{{item.name}}：{{item.current}}</text>
+    <button bindtap="changeBanzu" data-index="{{index}}" type="default">修改默认班组</button>
+  </view>
 </view>
 <view class="ad-banner">
   <ad unit-id="adunit-499feca899514736"></ad>
