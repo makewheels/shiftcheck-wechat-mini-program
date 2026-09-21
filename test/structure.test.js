@@ -113,6 +113,18 @@ test('8 个倒班页都有「跳转到指定日期」（picker + bindDateChange�
   assert.deepStrictEqual(missing, [], '这些倒班页缺「跳转到指定日期」：' + missing.join(', '))
 })
 
+test('wxml 里不许用 HTML 标签（span/div 等，开发者工具会告警）', function () {
+  const bad = []
+  const HTML_TAGS = ['span', 'div', 'p>', 'a>', 'a ', 'h1', 'h2', 'h3', 'ul', 'li', 'table']
+  wxmlFiles.forEach(function (w) {
+    const wsrc = fs.readFileSync(w, 'utf8')
+    HTML_TAGS.forEach(function (t) {
+      if (wsrc.indexOf('<' + t) !== -1) bad.push(relOf(w) + ' 用了 <' + t.trim() + '>')
+    })
+  })
+  assert.deepStrictEqual(bad, [], 'wxml 只认自己的标签（view/text/image/...）：' + bad.join(', '))
+})
+
 test('usingComponents 声明的组件文件齐全且标了 component:true', function () {
   const problems = []
   let checked = 0

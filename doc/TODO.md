@@ -103,8 +103,11 @@ LeanCloud 后台的 `WechatUser` / `PushMission` / `Rule` / `RuleKey` / `UserRul
       `bindDateChange`；`structure.test.js` 门禁 8 个倒班页都必须有 picker，
       `shift-pages.test.js` 逐页钉住跳转行为（1 基月份转 0 基、列表从跳转日重算、
       与直接设日期同源）。见 `doc/changes/2026-09-21-143210-date-picker.md`
-- [ ] **`pages/index/index.wxml` 用了 2 处 HTML 的 `<span>`**（单位名标签），
-      同页其它分组标签用的是 `<text>`。开发者工具会告警，应统一成 `<text>`
+- [x] ~~**`pages/index/index.wxml` 用了 2 处 HTML 的 `<span>`**（单位名标签）~~ ——
+      **2026-09-21 已改**：两处单位名标签统一成 `<text class="unit-label">`，
+      wxss 的 `span` 选择器同步改成 `.unit-label`（字号/颜色/边距保持原值，
+      行内其余表现跟随本页 text 通用规则）；`structure.test.js` 加门禁不许
+      HTML 标签进 wxml。见 `doc/changes/2026-09-21-145558-index-span.md`
 - [x] ~~**断网时首页会弹一次「登录没成功」**~~ —— **2026-09-14 已修**（发布前发现的最后一条阻塞项）。
       原先首页 `mystep2()` 的统计上报走"取不到 openid 就补登录、补不上就弹阻塞式 `showModal`"的路径，
       而**首页 8 个倒班入口全是纯本地计算、根本不需要登录**，用户只想查班却被拦住。
