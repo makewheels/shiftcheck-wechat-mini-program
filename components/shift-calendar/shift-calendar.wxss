@@ -36,6 +36,8 @@
   display: flex;
 }
 
+/* 普通日一律白底（2026-09 用户反馈：原来灰底/粉底/绿底不够醒目，
+   底色让位给节假日，上班/休息改由字色区分，见 .cal-text） */
 .cal-cell {
   flex: 1;
   height: 108rpx;
@@ -43,7 +45,7 @@
   padding: 4rpx 3rpx;
   box-sizing: border-box;
   border-radius: 8rpx;
-  background-color: #f2f2f2;
+  background-color: #fff;
   overflow: hidden;
 }
 
@@ -51,14 +53,27 @@
   background-color: transparent;
 }
 
-.cal-cell.is-work {
-  background-color: #fff0ed;
+/* 法定节假日（休）：浅红底 + 红框 + 红字，「哪天放假」一眼可见但格内班次字色保留 */
+.cal-cell.is-holiday {
+  background-color: #fdecec;
+  border: 2rpx solid #e64340;
 }
 
-.cal-cell.is-rest {
-  background-color: #edf9ee;
+.cal-cell.is-holiday .cal-num {
+  color: #d43a37;
+  font-weight: bold;
 }
 
+.cal-cell.is-holiday .cal-festival {
+  color: #d43a37;
+}
+
+/* 框 + 底色本身就是标记，「休」角标藏掉但占位（日期数字不左移） */
+.cal-cell.is-holiday .cal-badge {
+  visibility: hidden;
+}
+
+/* 今天还是绿框；落在节假日格上绿框盖过红框 */
 .cal-cell.is-today {
   border: 2rpx solid #1aad19;
 }
@@ -87,12 +102,9 @@
   padding: 0 5rpx;
 }
 
-.cal-badge.badge-rest {
-  background-color: #1aad19;
-}
-
-.cal-badge.badge-work {
-  background-color: #e64340;
+/* 调休补班日（班）：白底 + 橙色角标（区别于节假日的红） */
+.cal-badge.badge-buaban {
+  background-color: #f59f00;
 }
 
 .cal-badge-holder {
@@ -110,6 +122,7 @@
   word-break: break-all;
 }
 
+/* 上班/休息的区分：不用底色，用字色（红＝上班，绿＝休息） */
 .cal-cell.is-work .cal-text {
   color: #cf3b13;
 }
