@@ -98,8 +98,11 @@ LeanCloud 后台的 `WechatUser` / `PushMission` / `Rule` / `RuleKey` / `UserRul
       四班四倒 / 三班半倒 / 经警队都是硬编码默认一班。入口文案却是通用的。
       最小修法：把 `home.wxml` 的按钮文案改成「五班三倒默认班组」；
       或者给另外 3 种倒班方式也接上（各页 `onLoad` 里读对应的 storage key）
-- [ ] **四班四倒 / 三班半倒的 4 个页面没有「跳转到指定日期」**：只有五班三倒和经警队有
-      `<picker mode="date">`。逻辑可以直接从 `pages/wbsd/worker/worker.js` 的 `bindDateChange` 抄
+- [x] ~~**四班四倒 / 三班半倒的 4 个页面没有「跳转到指定日期」**~~ —— **2026-09-21 已补**：
+      4 个页面的 wxml 加 `<picker mode="date">`（位置与五班三倒页一致）、js 加逐字一致的
+      `bindDateChange`；`structure.test.js` 门禁 8 个倒班页都必须有 picker，
+      `shift-pages.test.js` 逐页钉住跳转行为（1 基月份转 0 基、列表从跳转日重算、
+      与直接设日期同源）。见 `doc/changes/2026-09-21-143210-date-picker.md`
 - [ ] **`pages/index/index.wxml` 用了 2 处 HTML 的 `<span>`**（单位名标签），
       同页其它分组标签用的是 `<text>`。开发者工具会告警，应统一成 `<text>`
 - [x] ~~**断网时首页会弹一次「登录没成功」**~~ —— **2026-09-14 已修**（发布前发现的最后一条阻塞项）。
