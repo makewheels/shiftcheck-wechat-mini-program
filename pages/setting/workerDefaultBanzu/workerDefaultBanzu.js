@@ -1,3 +1,5 @@
+var share = require('../../utils/share.js')
+
 Page({
   data: {
     wbsdCurrent: "loading..."
@@ -5,7 +7,7 @@ Page({
 
   //先加载已保存的设置中的内容
   onLoad: function () {
-    wx.showShareMenu()
+    share.setup(wx)
     var wbsdSaved = wx.getStorageSync('setting-wbsdDefault')
     if (wbsdSaved == undefined) {
       this.setData({
@@ -80,5 +82,9 @@ Page({
         })
       }
     })
-  }
+  },
+
+  //转发给朋友 / 分享到朋友圈
+  onShareAppMessage: share.appMessage,
+  onShareTimeline: share.timeline,
 })

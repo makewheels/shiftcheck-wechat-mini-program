@@ -1,10 +1,11 @@
 var app = getApp()
+var share = require('../../utils/share.js')
 
 Page({
   data: {},
 
   onLoad: function() {
-    wx.showShareMenu()
+    share.setup(wx)
     this.setData({
       appVersion: app.globalData.appVersion
     })
@@ -20,5 +21,9 @@ Page({
     wx.navigateTo({
       url: '../workerDefaultBanzu/workerDefaultBanzu',
     })
-  }
+  },
+
+  //转发给朋友 / 分享到朋友圈
+  onShareAppMessage: share.appMessage,
+  onShareTimeline: share.timeline,
 })
