@@ -1,6 +1,6 @@
 <view class="container">
   <view class="title">乔彬原创：查班神器</view>
-  <span>中 油 电 能：</span>
+  <text class="unit-label">中 油 电 能：</text>
   <view class="flex-wrap">
     <text>五班三倒：</text>
     <button bindtap="toWbsdWorker" hover-class="hover">个 人</button>
@@ -11,7 +11,7 @@
     <button bindtap="toJjdWorker" hover-class="hover">个 人</button>
     <button bindtap="toJjdDirector" hover-class="hover">总 览</button>
   </view>
-  <span>采 油 队：</span>
+  <text class="unit-label">采 油 队：</text>
   <view class="flex-wrap">
     <text>四班四倒：</text>
     <button bindtap="toSbsdWorker" type="primary">个 人</button>

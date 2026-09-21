@@ -7,7 +7,9 @@
   margin-bottom: 10rpx;
 }
 
-span {
+/* 单位名标签：原来是 HTML 的 <span>（开发者工具会告警），统一成 <text> + class。
+   行内其余表现（padding-top、line-height）跟随本页 text 通用规则，与分组标签一致 */
+.unit-label {
   color: blue;
   font-size: 50rpx;
   padding-right: 210rpx;
