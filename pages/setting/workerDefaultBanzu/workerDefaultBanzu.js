@@ -1,4 +1,4 @@
-var share = require('../../utils/share.js')
+var share = require('../../../utils/share.js')
 
 Page({
   data: {
