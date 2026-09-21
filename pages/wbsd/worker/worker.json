@@ -1,5 +1,6 @@
 {
   "usingComponents": {
     "shift-calendar": "/components/shift-calendar/shift-calendar"
-  }
+  },
+  "navigationBarTitleText": "五班三倒 · 个人"
 }

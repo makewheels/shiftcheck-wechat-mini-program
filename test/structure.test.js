@@ -92,6 +92,16 @@ test('代码里所有跳转目标都在 app.json 注册', function () {
   assert.deepStrictEqual(missing, [], '跳转目标未注册：' + missing.join('; '))
 })
 
+test('每个页面 json 都有 navigationBarTitleText（多级页面才分得出是哪页）', function () {
+  const missing = []
+  appJson.pages.forEach(function (p) {
+    const j = JSON.parse(fs.readFileSync(path.join(mp.REPO, p + '.json'), 'utf8'))
+    if (!j.navigationBarTitleText) missing.push(p + '.json')
+  })
+  assert.deepStrictEqual(missing, [],
+    '这些页面缺 navigationBarTitleText，标题栏会退回全局的「查班神器」：' + missing.join(', '))
+})
+
 test('usingComponents 声明的组件文件齐全且标了 component:true', function () {
   const problems = []
   let checked = 0

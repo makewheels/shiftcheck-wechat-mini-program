@@ -87,8 +87,10 @@ LeanCloud 后台的 `WechatUser` / `PushMission` / `Rule` / `RuleKey` / `UserRul
       按微信规则右上角根本不会出现「转发」。`README.md` 2.3.0 写的「给每个页面添加转发按钮」不成立。
       修法很便宜：写一个 `utils/share.js` 导出统一的 `onShareAppMessage`，11 个页面各加一行；
       顺便给 `showShareMenu` 传 `menus: ['shareAppMessage','shareTimeline']` 打开朋友圈
-- [ ] **11 个页面都没有 `navigationBarTitleText`**：标题栏全叫「查班神器」，多级页面分不出来。
-      每个 page json 加一行即可
+- [x] ~~**11 个页面都没有 `navigationBarTitleText`**~~ —— **2026-09-21 已补**：每个页面 json 加了自己的标题
+      （倒班页「xx · 个人/总览」、设置页「设置」、默认班组页「默认班组」，首页保持「查班神器」），
+      `structure.test.js` 有门禁守着新页面必须带标题。
+      见 `doc/changes/2026-09-21-135549-nav-titles.md`
 - [ ] **「个人模式默认班组」名不副实**：它写的 `setting-wbsdDefault` **只有五班三倒的个人页在读**，
       四班四倒 / 三班半倒 / 经警队都是硬编码默认一班。入口文案却是通用的。
       最小修法：把 `home.wxml` 的按钮文案改成「五班三倒默认班组」；
