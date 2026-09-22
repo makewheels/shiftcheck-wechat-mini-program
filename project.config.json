@@ -42,7 +42,7 @@
     "condition": false
   },
   "compileType": "miniprogram",
-  "libVersion": "2.8.2",
+  "libVersion": "2.25.3",
   "appid": "wx46b9f529e9244893",
   "projectname": "%E6%9F%A5%E7%8F%AD%E7%A5%9E%E5%99%A8",
   "isGameTourist": false,
