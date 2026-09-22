@@ -9,7 +9,7 @@
 
   <view class="cal-row" wx:for="{{cal.weeks}}" wx:for-item="week" wx:key="key">
     <view
-      class="cal-cell {{cell.blank ? 'is-blank' : ''}} {{cell.work === true ? 'is-work' : ''}} {{cell.work === false ? 'is-rest' : ''}} {{cell.isToday ? 'is-today' : ''}}"
+      class="cal-cell {{cell.blank ? 'is-blank' : ''}} {{cell.work === true ? 'is-work' : ''}} {{cell.work === false ? 'is-rest' : ''}} {{cell.holidayType === '休' ? 'is-holiday' : ''}} {{cell.holidayType === '班' ? 'is-buaban' : ''}} {{cell.isToday ? 'is-today' : ''}}"
       wx:for="{{week.cells}}"
       wx:for-item="cell"
       wx:key="key"
@@ -18,7 +18,7 @@
       bindtap="onDayTap">
       <block wx:if="{{!cell.blank}}">
         <view class="cal-line1">
-          <text class="cal-badge {{cell.holidayType === '班' ? 'badge-work' : 'badge-rest'}}" wx:if="{{cell.holidayType}}">{{cell.holidayType}}</text>
+          <text class="cal-badge {{cell.holidayType === '班' ? 'badge-buaban' : 'badge-rest'}}" wx:if="{{cell.holidayType}}">{{cell.holidayType}}</text>
           <text class="cal-badge-holder" wx:else></text>
           <text class="cal-num">{{cell.day}}</text>
         </view>
@@ -28,6 +28,6 @@
     </view>
   </view>
 
-  <view class="cal-tip" wx:if="{{cal.hasHolidayData}}">休＝法定节假日　班＝调休补班　点某一天回到列表</view>
+  <view class="cal-tip" wx:if="{{cal.hasHolidayData}}">红＝法定节假日　「班」＝调休补班　点某一天回到列表</view>
   <view class="cal-tip" wx:else>{{cal.year}} 年的节假日数据尚未内置，格内只显示班况</view>
 </view>
