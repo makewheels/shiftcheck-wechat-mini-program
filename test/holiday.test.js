@@ -6,6 +6,7 @@
  * 所以这里把国务院办公厅通知里的关键数字全部钉死：
  *   2025 年：国办发明电〔2024〕12 号  https://www.gov.cn/zhengce/content/202411/content_6986382.htm
  *   2026 年：国办发明电〔2025〕7 号   https://www.gov.cn/zhengce/content/202511/content_7047090.htm
+ *   2027 年：国办发明电〔2026〕10 号  https://www.gov.cn/zhengce/zhengceku/202611/content_7085102.htm
  * 通知每年 11 月发布下一年的安排，补数据时要同步更新这里的断言。
  */
 const test = require('node:test')
@@ -16,11 +17,22 @@ const holiday = require('../utils/holiday.js')
 // 通知里公布的放假日总天数与补班日总天数
 const EXPECT_COUNTS = {
   2025: { holidays: 28, workdays: 5 },
-  2026: { holidays: 33, workdays: 6 }
+  2026: { holidays: 33, workdays: 6 },
+  2027: { holidays: 29, workdays: 5 }
 }
 
 // 逐日扫描官方通知里的具体日期抽查（month 是 0-11）
 const SPOT_CHECKS = [
+  // 2027
+  [2027, 0, 1, '休', '元旦'], [2027, 0, 3, '休', '元旦'], [2027, 0, 4, '', ''],
+  [2027, 0, 31, '班', '春节调休'],
+  [2027, 1, 5, '休', '春节'], [2027, 1, 13, '休', '春节'], [2027, 1, 14, '班', '春节调休'],
+  [2027, 3, 3, '休', '清明节'], [2027, 3, 5, '休', '清明节'], [2027, 3, 6, '', ''],
+  [2027, 4, 1, '休', '劳动节'], [2027, 4, 5, '休', '劳动节'], [2027, 4, 8, '班', '劳动节调休'],
+  [2027, 5, 9, '休', '端午节'], [2027, 5, 10, '', ''],
+  [2027, 8, 15, '休', '中秋节'], [2027, 8, 26, '班', '国庆节调休'], [2027, 8, 27, '', ''],
+  [2027, 9, 1, '休', '国庆节'], [2027, 9, 7, '休', '国庆节'], [2027, 9, 8, '', ''],
+  [2027, 9, 9, '班', '国庆节调休'],
   // 2026
   [2026, 0, 1, '休', '元旦'], [2026, 0, 3, '休', '元旦'], [2026, 0, 4, '班', '元旦调休'],
   [2026, 1, 14, '班', '春节调休'], [2026, 1, 15, '休', '春节'], [2026, 1, 17, '休', '春节'],
@@ -94,12 +106,13 @@ test('官方通知里的具体日期抽查', function () {
 })
 
 test('未内置的年份返回空标注，不编造数据', function () {
-  // 2027 年的通知在本仓库最后更新时还没发布（通知一般每年 11 月出）
-  assert.strictEqual(holiday.hasData(2027), false, '2027 年通知未发布，不该有数据')
+  // 2028 年的通知本仓库最后更新时还没发布（国务院一般每年 11 月出下一年的安排）
+  assert.strictEqual(holiday.hasData(2028), false, '2028 年通知未发布，不该有数据')
   assert.strictEqual(holiday.hasData(2024), false)
   assert.strictEqual(holiday.hasData(2030), false)
-  assert.deepStrictEqual(holiday.info(2027, 9, 1), { type: '', name: '' })
-  assert.deepStrictEqual(holiday.info(2027, 0, 1), { type: '', name: '' }, '元旦也不该凭空标出来')
+  assert.deepStrictEqual(holiday.info(2028, 9, 1), { type: '', name: '' })
+  assert.deepStrictEqual(holiday.info(2028, 0, 1), { type: '', name: '' }, '元旦也不该凭空标出来')
   assert.strictEqual(holiday.hasData(2025), true)
   assert.strictEqual(holiday.hasData(2026), true)
+  assert.strictEqual(holiday.hasData(2027), true)
 })
