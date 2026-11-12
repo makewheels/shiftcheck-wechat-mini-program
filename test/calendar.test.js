@@ -97,7 +97,8 @@ test('buildMonth：节假日标注与今天标记', function () {
   assert.strictEqual(byDay[21].holidayType, '', '普通日子不该有标注')
 
   assert.strictEqual(cal.hasHolidayData, true)
-  assert.strictEqual(calendar.buildMonth(2027, 0, noop).hasHolidayData, false, '2027 未内置数据')
+  assert.strictEqual(calendar.buildMonth(2027, 0, noop).hasHolidayData, true, '2027 已内置数据')
+  assert.strictEqual(calendar.buildMonth(2028, 0, noop).hasHolidayData, false, '2028 未内置数据')
 
   // 今天标记：只有当天所在月份里恰好一格是今天
   const now = new Date()
